@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FotoFix - Real Estate Photo Enhancement</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-camera"></i> FotoFix</h1>
+            <p class="subtitle">Transform your real estate photos with AI-powered enhancement</p>
+        </header>
+
+        <main class="main-content">
+            <div class="upload-section">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-content">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <h3>Upload Your Photos</h3>
+                        <p>Drag and drop up to 10 high-resolution images (max 10MB each)</p>
+                        <button class="upload-btn" id="uploadBtn">Choose Files</button>
+                        <input type="file" id="fileInput" multiple accept="image/*" style="display: none;">
+                    </div>
+                </div>
+                
+                <div class="instructions-section">
+                    <label for="customInstructions">Special Instructions (Optional):</label>
+                    <textarea id="customInstructions" placeholder="Add any specific requirements for your photos..."></textarea>
+                </div>
+            </div>
+
+            <div class="preview-section" id="previewSection" style="display: none;">
+                <h3>Your Photos</h3>
+                <div class="images-grid" id="imagesGrid">
+                    <!-- Original and enhanced images will be displayed here -->
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="processBtn">
+                        <i class="fas fa-magic"></i> Enhance Photos
+                    </button>
+                    <button class="btn btn-secondary" id="resetBtn">
+                        <i class="fas fa-redo"></i> Start Over
+                    </button>
+                </div>
+            </div>
+
+            <div class="checkout-section" id="checkoutSection" style="display: none;">
+                <h3>Select Images to Purchase</h3>
+                <div class="enhanced-images" id="enhancedImages">
+                    <!-- Enhanced images with buy checkboxes will be displayed here -->
+                </div>
+                <div class="checkout-summary">
+                    <div class="total-info">
+                        <span>Total: $<span id="totalPrice">0</span></span>
+                        <span class="price-per-image">$20 per image</span>
+                    </div>
+                    <button class="btn btn-success" id="checkoutBtn" disabled>
+                        <i class="fas fa-credit-card"></i> Proceed to Checkout
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 FotoFix. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- Loading Modal -->
+    <div class="modal" id="loadingModal">
+        <div class="modal-content">
+            <div class="loading-spinner"></div>
+            <h3>Processing Your Photos</h3>
+            <p>Please wait while we enhance your images...</p>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div class="modal" id="errorModal">
+        <div class="modal-content">
+            <i class="fas fa-exclamation-triangle error-icon"></i>
+            <h3>Error</h3>
+            <p id="errorMessage"></p>
+            <button class="btn btn-primary" onclick="closeErrorModal()">OK</button>
+        </div>
+    </div>
+
+    <script src="assets/js/script.js"></script>
+</body>
+</html>

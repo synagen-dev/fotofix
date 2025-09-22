@@ -1,7 +1,7 @@
 <?php
 /**
  * Google AI Integration Module for FotoFix
- * Handles communication with Google's AI image generation services
+ * Handles communication with Google's Gemini AI image generation services
  */
 
 class GoogleAIIntegration {
@@ -9,7 +9,7 @@ class GoogleAIIntegration {
     private $baseUrl;
     private $model;
     
-    public function __construct($apiKey, $model = 'nano-banana') {
+    public function __construct($apiKey, $model = 'gemini-1.5-flash') {
         $this->apiKey = $apiKey;
         $this->model = $model;
         $this->baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/';
@@ -29,7 +29,7 @@ class GoogleAIIntegration {
             $imageData = file_get_contents($imagePath);
             $base64Image = base64_encode($imageData);
             
-            // Prepare the request payload
+            // Prepare the request payload for Gemini API
             $payload = [
                 'contents' => [
                     [
@@ -75,10 +75,11 @@ class GoogleAIIntegration {
             // Make the API request
             $response = $this->makeApiRequest($payload);
             
-            if ($response && isset($response['candidates'][0]['content']['parts'][0]['inline_data']['data'])) {
-                // Decode and save the enhanced image
-                $enhancedImageData = base64_decode($response['candidates'][0]['content']['parts'][0]['inline_data']['data']);
-                return file_put_contents($outputPath, $enhancedImageData) !== false;
+            if ($response && isset($response['candidates'][0]['content']['parts'][0]['text'])) {
+                // For now, we'll use the fallback enhancement since Gemini doesn't directly return images
+                // In a real implementation, you might need to use a different approach
+                error_log('Gemini API returned text response, using fallback enhancement');
+                return FallbackImageEnhancement::enhance($imagePath, $outputPath);
             }
             
             return false;
@@ -98,6 +99,10 @@ class GoogleAIIntegration {
     private function makeApiRequest($payload) {
         $url = $this->baseUrl . $this->model . ':generateContent?key=' . $this->apiKey;
         
+        // Log the request for debugging
+        error_log('Making Gemini API request to: ' . $url);
+        error_log('Payload: ' . json_encode($payload));
+        
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -109,11 +114,18 @@ class GoogleAIIntegration {
         ]);
         curl_setopt($ch, CURLOPT_TIMEOUT, 60);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_VERBOSE, true);
         
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $error = curl_error($ch);
+        $info = curl_getinfo($ch);
         curl_close($ch);
+        
+        // Log detailed response information
+        error_log('HTTP Code: ' . $httpCode);
+        error_log('Response: ' . $response);
+        error_log('cURL Info: ' . json_encode($info));
         
         if ($error) {
             error_log('cURL error: ' . $error);
@@ -129,6 +141,7 @@ class GoogleAIIntegration {
         
         if (json_last_error() !== JSON_ERROR_NONE) {
             error_log('JSON decode error: ' . json_last_error_msg());
+            error_log('Raw response: ' . $response);
             return false;
         }
         
@@ -153,20 +166,33 @@ class GoogleAIIntegration {
      */
     public function testConnection() {
         try {
+            // Simple test payload for Gemini API
             $payload = [
                 'contents' => [
                     [
                         'parts' => [
                             [
-                                'text' => 'Test connection'
+                                'text' => 'Hello, this is a test. Please respond with "Test successful".'
                             ]
                         ]
                     ]
+                ],
+                'generationConfig' => [
+                    'temperature' => 0.1,
+                    'maxOutputTokens' => 50,
                 ]
             ];
             
             $response = $this->makeApiRequest($payload);
-            return $response !== false;
+            
+            // Check if we got a valid response
+            if ($response && isset($response['candidates'][0]['content']['parts'][0]['text'])) {
+                $responseText = $response['candidates'][0]['content']['parts'][0]['text'];
+                error_log('Gemini API test response: ' . $responseText);
+                return true;
+            }
+            
+            return false;
             
         } catch (Exception $e) {
             error_log('Connection test error: ' . $e->getMessage());

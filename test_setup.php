@@ -61,16 +61,19 @@ if (defined('STRIPE_SECRET_KEY') && STRIPE_SECRET_KEY !== 'sk_test_YOUR_STRIPE_S
 
 // Test 5: Test Google AI connection (if API key is configured)
 echo "<h2>5. Google AI Connection Test</h2>\n";
-// echo "Key=".GOOGLE_AI_API_KEY.", model=".GOOGLE_AI_MODEL." <br>";
-if (defined('GOOGLE_AI_API_KEY') && GOOGLE_AI_API_KEY !== 'YOUR_GOOGLE_AI_API_KEY') {
+echo "API Key: " . (defined('GOOGLE_AI_API_KEY') ? (strlen(GOOGLE_AI_API_KEY) > 10 ? substr(GOOGLE_AI_API_KEY, 0, 10) . '...' : GOOGLE_AI_API_KEY) : 'Not defined') . "<br>";
+echo "Model: " . (defined('GOOGLE_AI_MODEL') ? GOOGLE_AI_MODEL : 'Not defined') . "<br>";
+
+if (defined('GOOGLE_AI_API_KEY') && !empty(GOOGLE_AI_API_KEY)) {
     $googleAI = new GoogleAIIntegration(GOOGLE_AI_API_KEY, GOOGLE_AI_MODEL);
     if ($googleAI->testConnection()) {
         echo "✅ Google AI connection successful\n";
     } else {
         echo "❌ Google AI connection failed\n";
+        echo "Check the error logs for more details: /mnt/docker/apps/logs/fotofix/error.log<br>";
     }
 } else {
-    echo "⚠️ Skipping Google AI test (API key not configured)\n";
+    echo "⚠️ Skipping Google AI test (API key not configured or empty)\n";
 }
 
 // Test 6: Test image processing

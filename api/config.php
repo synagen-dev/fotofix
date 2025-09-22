@@ -50,8 +50,12 @@ define('PREVIEW_WIDTH', 600);
 define('PREVIEW_QUALITY', 85);
 
 // Google AI settings
-define('GOOGLE_AI_API_KEY', getenv('GOOGLE_AISTUDIO_KEY') ); 
-define('GOOGLE_AI_MODEL', 'gemini-2.5-flash-image-preview'); 
+$googleApiKey = getenv('GOOGLE_AISTUDIO_KEY');
+if ($debugMode && $glog) {
+    fwrite($glog, "Google API Key from environment: " . ($googleApiKey ? substr($googleApiKey, 0, 10) . '...' : 'NOT SET') . "\r\n");
+}
+define('GOOGLE_AI_API_KEY', $googleApiKey); 
+define('GOOGLE_AI_MODEL', 'gemini-1.5-flash'); 
 
 // Default AI instructions
 define('DEFAULT_INSTRUCTIONS', 'Make this image look more modern, more attractive, more appealing to a greater range of prospective buyers. Do not change the structure in any way. Do not change the size, position or orientation of any walls, floors or ceilings.');

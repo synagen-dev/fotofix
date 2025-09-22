@@ -88,7 +88,8 @@ curl_setopt_array($ch, [
 ]);
 $response = curl_exec($ch);
 curl_close($ch);
-echo "<BR>Response=$ch<BR>";
+$result = json_decode($response, true);
+echo "<BR>Response=$result<BR>";
 
 // Test 6: Test image processing
 echo "<h2>6. Image Processing Test</h2>\n";

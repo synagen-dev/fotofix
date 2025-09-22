@@ -78,7 +78,7 @@ if (defined('GOOGLE_AI_API_KEY') && GOOGLE_AI_API_KEY !== 'YOUR_GOOGLE_AI_API_KE
 $ch = curl_init('https://generativelanguage.googleapis.com/v1beta/models/');
 curl_setopt_array($ch, [
     CURLOPT_HTTPHEADER => [
-        "Authorization: Bearer " . $GOOGLE_AI_API_KEY,
+        "Authorization: Bearer " . GOOGLE_AI_API_KEY,
         "Content-Type: application/json"
     ],
     CURLOPT_POST => true,

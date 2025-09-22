@@ -25,9 +25,19 @@ class GoogleAIIntegration {
      */
     public function enhanceImage($imagePath, $instructions, $outputPath) {
         try {
-            // Read and encode the image
-            $imageData = file_get_contents($imagePath);
+            // Create a smaller version of the image for Gemini processing
+            $tempImagePath = $this->createResizedImageForAI($imagePath);
+            if (!$tempImagePath) {
+                error_log('Failed to create resized image for AI processing');
+                return false;
+            }
+            
+            // Read and encode the resized image
+            $imageData = file_get_contents($tempImagePath);
             $base64Image = base64_encode($imageData);
+            
+            // Clean up temp file
+            unlink($tempImagePath);
             
             // Prepare the request payload for Gemini API
             $payload = [
@@ -50,7 +60,7 @@ class GoogleAIIntegration {
                     'temperature' => 0.7,
                     'topK' => 40,
                     'topP' => 0.95,
-                    'maxOutputTokens' => 1024,
+                    'maxOutputTokens' => 100, // Reduced token limit
                 ],
                 'safetySettings' => [
                     [
@@ -77,12 +87,22 @@ class GoogleAIIntegration {
             
             if ($response && isset($response['candidates'][0]['content']['parts'][0]['text'])) {
                 // Gemini API returned text response - this means it understood the instructions
-                // but since Gemini doesn't directly modify images, we'll use the fallback enhancement
-                // with the understanding that the AI has "seen" and understood the enhancement requirements
-                error_log('Gemini API understood instructions: ' . $response['candidates'][0]['content']['parts'][0]['text']);
+                $aiResponse = $response['candidates'][0]['content']['parts'][0]['text'];
+                error_log('Gemini API response: ' . $aiResponse);
                 
-                // Use fallback enhancement but with enhanced parameters based on the instructions
-                return $this->enhancedFallbackEnhancement($imagePath, $outputPath, $instructions);
+                // Check if the response indicates successful understanding
+                if (strpos(strtolower($aiResponse), 'error') === false && 
+                    (strpos(strtolower($aiResponse), 'enhance') !== false || 
+                     strpos(strtolower($aiResponse), 'improve') !== false ||
+                     strpos(strtolower($aiResponse), 'modify') !== false)) {
+                    
+                    // AI understood the instructions, use enhanced processing
+                    return $this->enhancedFallbackEnhancement($imagePath, $outputPath, $instructions);
+                } else {
+                    // AI didn't understand or had issues, use basic enhancement
+                    error_log('Gemini API response indicates issues, using basic enhancement');
+                    return FallbackImageEnhancement::enhance($imagePath, $outputPath);
+                }
             }
             
             return false;
@@ -152,6 +172,74 @@ class GoogleAIIntegration {
     }
     
     /**
+     * Create a resized image for AI processing to reduce token usage
+     * 
+     * @param string $imagePath Path to the original image
+     * @return string|false Path to resized image or false on failure
+     */
+    private function createResizedImageForAI($imagePath) {
+        try {
+            $imageInfo = getimagesize($imagePath);
+            if (!$imageInfo) {
+                return false;
+            }
+
+            $originalWidth = $imageInfo[0];
+            $originalHeight = $imageInfo[1];
+            $mimeType = $imageInfo['mime'];
+            
+            // Resize to maximum 800px on the longest side to reduce token usage
+            $maxSize = 800;
+            if ($originalWidth > $originalHeight) {
+                $newWidth = $maxSize;
+                $newHeight = intval(($originalHeight * $maxSize) / $originalWidth);
+            } else {
+                $newHeight = $maxSize;
+                $newWidth = intval(($originalWidth * $maxSize) / $originalHeight);
+            }
+            
+            // Create source image
+            $sourceImage = $this->createImageFromFile($imagePath, $mimeType);
+            if (!$sourceImage) {
+                return false;
+            }
+            
+            // Create resized image
+            $resizedImage = imagecreatetruecolor($newWidth, $newHeight);
+            
+            // Preserve transparency for PNG
+            if ($mimeType === 'image/png') {
+                imagealphablending($resizedImage, false);
+                imagesavealpha($resizedImage, true);
+                $transparent = imagecolorallocatealpha($resizedImage, 255, 255, 255, 127);
+                imagefilledrectangle($resizedImage, 0, 0, $newWidth, $newHeight, $transparent);
+            }
+            
+            // Resize image
+            imagecopyresampled(
+                $resizedImage, $sourceImage,
+                0, 0, 0, 0,
+                $newWidth, $newHeight,
+                $originalWidth, $originalHeight
+            );
+            
+            // Save resized image
+            $tempPath = sys_get_temp_dir() . '/fotofix_ai_' . uniqid() . '.jpg';
+            $result = imagejpeg($resizedImage, $tempPath, 85); // Good quality but smaller file
+            
+            // Clean up
+            imagedestroy($sourceImage);
+            imagedestroy($resizedImage);
+            
+            return $result ? $tempPath : false;
+            
+        } catch (Exception $e) {
+            error_log('Error creating resized image for AI: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Get MIME type of an image file
      * 
      * @param string $imagePath Path to the image file
@@ -182,7 +270,7 @@ class GoogleAIIntegration {
                 ],
                 'generationConfig' => [
                     'temperature' => 0.1,
-                    'maxOutputTokens' => 50,
+                    'maxOutputTokens' => 20, // Very small token limit for test
                 ]
             ];
             

@@ -3,11 +3,16 @@ class FotoFixApp {
         this.uploadedFiles = [];
         this.enhancedImages = [];
         this.selectedImages = new Set();
+        this.enhancementOptions = {
+            exterior: {},
+            interior: {}
+        };
         this.init();
     }
 
     init() {
         this.setupEventListeners();
+        this.loadEnhancementOptions();
     }
 
     setupEventListeners() {
@@ -54,6 +59,11 @@ class FotoFixApp {
 
         // Checkout button
         checkoutBtn.addEventListener('click', () => this.proceedToCheckout());
+
+        // Photo type change
+        document.querySelectorAll('input[name="photoType"]').forEach(radio => {
+            radio.addEventListener('change', () => this.updateEnhancementOptions());
+        });
     }
 
     handleFiles(files) {
@@ -119,8 +129,9 @@ class FotoFixApp {
                 formData.append('images[]', file);
             });
             
-            const customInstructions = document.getElementById('customInstructions').value;
-            formData.append('custom_instructions', customInstructions);
+            // Get enhancement options
+            const enhancementOptions = this.getSelectedEnhancementOptions();
+            formData.append('enhancement_options', JSON.stringify(enhancementOptions));
 
             const response = await fetch('api/process_images.php', {
                 method: 'POST',
@@ -305,6 +316,93 @@ class FotoFixApp {
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    async loadEnhancementOptions() {
+        try {
+            const response = await fetch('api/get_enhancement_options.php');
+            const data = await response.json();
+            
+            if (data.success) {
+                this.enhancementOptions = data.options;
+                this.updateEnhancementOptions();
+            }
+        } catch (error) {
+            console.error('Error loading enhancement options:', error);
+            // Use default options if API fails
+            this.enhancementOptions = {
+                exterior: {
+                    'landscaping': { name: 'Landscaping Improvements', description: 'Enhance grass, plants, and outdoor features' },
+                    'sky_weather': { name: 'Sky & Weather Enhancement', description: 'Improve sky appearance and weather conditions' },
+                    'exterior_cleaning': { name: 'Exterior Cleaning', description: 'Clean and brighten exterior surfaces' },
+                    'outdoor_furniture': { name: 'Outdoor Furniture', description: 'Add or improve outdoor furniture' },
+                    'lighting': { name: 'Exterior Lighting', description: 'Enhance outdoor lighting' }
+                },
+                interior: {
+                    'furniture_modernization': { name: 'Furniture Modernization', description: 'Replace old furniture with modern pieces' },
+                    'cleaning_decluttering': { name: 'Cleaning & Decluttering', description: 'Remove clutter and clean surfaces' },
+                    'lighting_enhancement': { name: 'Lighting Enhancement', description: 'Improve interior lighting' },
+                    'color_scheme': { name: 'Color Scheme Update', description: 'Modernize color schemes' },
+                    'decorative_touches': { name: 'Decorative Touches', description: 'Add tasteful decorative elements' }
+                }
+            };
+            this.updateEnhancementOptions();
+        }
+    }
+
+    updateEnhancementOptions() {
+        const photoType = document.querySelector('input[name="photoType"]:checked').value;
+        const container = document.getElementById('enhancementCheckboxes');
+        
+        container.innerHTML = '';
+        
+        if (photoType === 'mixed') {
+            // Show both interior and exterior options
+            this.renderEnhancementCategory('Exterior Enhancements', this.enhancementOptions.exterior, container);
+            this.renderEnhancementCategory('Interior Enhancements', this.enhancementOptions.interior, container);
+        } else {
+            // Show options for selected type
+            const options = this.enhancementOptions[photoType] || {};
+            this.renderEnhancementCategory(`${photoType.charAt(0).toUpperCase() + photoType.slice(1)} Enhancements`, options, container);
+        }
+    }
+
+    renderEnhancementCategory(title, options, container) {
+        const categoryDiv = document.createElement('div');
+        categoryDiv.className = 'enhancement-category';
+        
+        const titleElement = document.createElement('h4');
+        titleElement.textContent = title;
+        categoryDiv.appendChild(titleElement);
+        
+        Object.entries(options).forEach(([key, option]) => {
+            const optionDiv = document.createElement('div');
+            optionDiv.className = 'enhancement-option';
+            
+            optionDiv.innerHTML = `
+                <input type="checkbox" id="${key}" value="${key}" checked>
+                <div class="enhancement-option-content">
+                    <div class="enhancement-option-name">${option.name}</div>
+                    <div class="enhancement-option-description">${option.description}</div>
+                </div>
+            `;
+            
+            categoryDiv.appendChild(optionDiv);
+        });
+        
+        container.appendChild(categoryDiv);
+    }
+
+    getSelectedEnhancementOptions() {
+        const photoType = document.querySelector('input[name="photoType"]:checked').value;
+        const checkboxes = document.querySelectorAll('#enhancementCheckboxes input[type="checkbox"]:checked');
+        const selectedOptions = Array.from(checkboxes).map(cb => cb.value);
+        
+        return {
+            photoType: photoType,
+            options: selectedOptions,
+            customInstructions: document.getElementById('customInstructions').value
+        };
     }
 }
 

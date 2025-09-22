@@ -115,14 +115,134 @@ body {
     margin-top: 30px;
 }
 
-.instructions-section label {
+.instructions-section h3 {
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 1.3rem;
+}
+
+.enhancement-options {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+}
+
+.photo-type-selection {
+    margin-bottom: 25px;
+}
+
+.photo-type-selection label {
+    display: block;
+    margin-bottom: 15px;
+    font-weight: 600;
+    color: #333;
+}
+
+.radio-group {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px 15px;
+    background: white;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    margin: 0;
+}
+
+.radio-option:hover {
+    border-color: #667eea;
+    background: #f0f4ff;
+}
+
+.radio-option input[type="radio"] {
+    margin-right: 8px;
+    transform: scale(1.2);
+}
+
+.radio-option input[type="radio"]:checked + span {
+    color: #667eea;
+    font-weight: 600;
+}
+
+.radio-option:has(input[type="radio"]:checked) {
+    border-color: #667eea;
+    background: #f0f4ff;
+}
+
+.enhancement-checkboxes {
+    margin-bottom: 25px;
+}
+
+.enhancement-category {
+    margin-bottom: 20px;
+}
+
+.enhancement-category h4 {
+    margin-bottom: 10px;
+    color: #555;
+    font-size: 1.1rem;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+}
+
+.enhancement-option {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    padding: 10px;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.enhancement-option:hover {
+    border-color: #667eea;
+    background: #f8f9ff;
+}
+
+.enhancement-option input[type="checkbox"] {
+    margin-right: 10px;
+    margin-top: 2px;
+    transform: scale(1.1);
+}
+
+.enhancement-option-content {
+    flex: 1;
+}
+
+.enhancement-option-name {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.enhancement-option-description {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.4;
+}
+
+.custom-instructions {
+    margin-top: 20px;
+}
+
+.custom-instructions label {
     display: block;
     margin-bottom: 10px;
     font-weight: 600;
     color: #333;
 }
 
-.instructions-section textarea {
+.custom-instructions textarea {
     width: 100%;
     padding: 15px;
     border: 2px solid #ddd;
@@ -133,7 +253,7 @@ body {
     font-family: inherit;
 }
 
-.instructions-section textarea:focus {
+.custom-instructions textarea:focus {
     outline: none;
     border-color: #667eea;
 }

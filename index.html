@@ -27,8 +27,35 @@
                 </div>
                 
                 <div class="instructions-section">
-                    <label for="customInstructions">Special Instructions (Optional):</label>
-                    <textarea id="customInstructions" placeholder="Add any specific requirements for your photos..."></textarea>
+                    <h3>Enhancement Options</h3>
+                    <div class="enhancement-options">
+                        <div class="photo-type-selection">
+                            <label>Photo Type:</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="photoType" value="exterior" checked>
+                                    <span>Exterior Photos</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="photoType" value="interior">
+                                    <span>Interior Photos</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="photoType" value="mixed">
+                                    <span>Mixed (Both Types)</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="enhancement-checkboxes" id="enhancementCheckboxes">
+                            <!-- Enhancement options will be populated by JavaScript -->
+                        </div>
+                        
+                        <div class="custom-instructions">
+                            <label for="customInstructions">Additional Instructions (Optional):</label>
+                            <textarea id="customInstructions" placeholder="Add any specific requirements for your photos..."></textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
 

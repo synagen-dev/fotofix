@@ -1,6 +1,7 @@
 <?php
 require_once 'config.php';
 require_once 'google_ai_integration.php';
+require_once 'enhancement_instructions.php';
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -48,11 +49,14 @@ try {
         $validFiles[] = $file;
     }
 
+    // Get enhancement options
+    $enhancementOptions = [];
+    if (isset($_POST['enhancement_options'])) {
+        $enhancementOptions = json_decode($_POST['enhancement_options'], true);
+    }
+    
     // Get custom instructions
     $customInstructions = isset($_POST['custom_instructions']) ? trim($_POST['custom_instructions']) : '';
-    $finalInstructions = !empty($customInstructions) ? 
-        DEFAULT_INSTRUCTIONS . ' ' . $customInstructions : 
-        DEFAULT_INSTRUCTIONS;
 
     // Process each image
     $enhancedImages = [];
@@ -68,6 +72,26 @@ try {
             throw new Exception('Failed to save file: ' . $file['name']);
         }
 
+        // Determine photo type and generate instructions
+        $photoType = EnhancementInstructions::analyzeImageType($originalPath);
+        
+        // If mixed type is selected, analyze each image individually
+        if (isset($enhancementOptions['photoType']) && $enhancementOptions['photoType'] === 'mixed') {
+            $photoType = EnhancementInstructions::analyzeImageType($originalPath);
+        } elseif (isset($enhancementOptions['photoType'])) {
+            $photoType = $enhancementOptions['photoType'];
+        }
+        
+        // Generate enhancement instructions
+        $selectedOptions = isset($enhancementOptions['options']) ? $enhancementOptions['options'] : [];
+        $customInstructions = isset($enhancementOptions['customInstructions']) ? $enhancementOptions['customInstructions'] : '';
+        
+        $finalInstructions = EnhancementInstructions::generateInstructions(
+            $selectedOptions, 
+            $photoType, 
+            $customInstructions
+        );
+
         // Process with AI
         $enhancedImage = processImageWithAI($originalPath, $finalInstructions, $uniqueId);
         
@@ -77,7 +101,8 @@ try {
                 'unique_id' => $uniqueId,
                 'preview_url' => $enhancedImage['preview_url'],
                 'download_url' => $enhancedImage['download_url'],
-                'session_id' => $sessionId
+                'session_id' => $sessionId,
+                'photo_type' => $photoType
             ];
         } else {
             throw new Exception('Failed to process image: ' . $file['name']);

@@ -61,6 +61,7 @@ if (defined('STRIPE_SECRET_KEY') && STRIPE_SECRET_KEY !== 'sk_test_YOUR_STRIPE_S
 
 // Test 5: Test Google AI connection (if API key is configured)
 echo "<h2>5. Google AI Connection Test</h2>\n";
+echo "Key= GOOGLE_AI_API_KEY, model= GOOGLE_AI_MODEL <br>";
 if (defined('GOOGLE_AI_API_KEY') && GOOGLE_AI_API_KEY !== 'YOUR_GOOGLE_AI_API_KEY') {
     $googleAI = new GoogleAIIntegration(GOOGLE_AI_API_KEY, GOOGLE_AI_MODEL);
     if ($googleAI->testConnection()) {

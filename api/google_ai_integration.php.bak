@@ -355,10 +355,10 @@ class GoogleAIIntegration {
             'IMG_FILTER_BRIGHTNESS' => IMG_FILTER_BRIGHTNESS,
             'IMG_FILTER_CONTRAST' => IMG_FILTER_CONTRAST,
             'IMG_FILTER_COLORIZE' => IMG_FILTER_COLORIZE,
-            'IMG_FILTER_SATURATE' => IMG_FILTER_SATURATE,
             'IMG_FILTER_GAUSSIAN_BLUR' => IMG_FILTER_GAUSSIAN_BLUR,
         ];
-        
+        //  'IMG_FILTER_SATURATE' => IMG_FILTER_SATURATE,  <= not available
+		
         foreach ($filters as $name => $constant) {
             if (defined($name)) {
                 $availableFilters[] = $name;

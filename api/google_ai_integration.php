@@ -60,7 +60,7 @@ class GoogleAIIntegration {
                     'temperature' => 0.7,
                     'topK' => 40,
                     'topP' => 0.95,
-                    'maxOutputTokens' => 1500, // Reduced token limit
+                    'maxOutputTokens' => 3000, 
                 ],
                 'safetySettings' => [
                     [

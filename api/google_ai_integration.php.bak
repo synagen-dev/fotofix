@@ -60,7 +60,7 @@ class GoogleAIIntegration {
                     'temperature' => 0.7,
                     'topK' => 40,
                     'topP' => 0.95,
-                    'maxOutputTokens' => 500, // Reduced token limit
+                    'maxOutputTokens' => 1500, // Reduced token limit
                 ],
                 'safetySettings' => [
                     [
@@ -270,7 +270,7 @@ class GoogleAIIntegration {
                 ],
                 'generationConfig' => [
                     'temperature' => 0.1,
-                    'maxOutputTokens' => 100, // Very small token limit for test
+                    'maxOutputTokens' => 50, // Very small token limit for test
                 ]
             ];
             

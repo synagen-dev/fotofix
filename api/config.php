@@ -50,7 +50,7 @@ define('PREVIEW_WIDTH', 600);
 define('PREVIEW_QUALITY', 85);
 
 // Google AI settings
-define('GOOGLE_AI_API_KEY', getenv('GOOGLE_AISTUDIO_KEY'); 
+define('GOOGLE_AI_API_KEY', getenv('GOOGLE_AISTUDIO_KEY') ); 
 define('GOOGLE_AI_MODEL', 'gemini-2.5-flash-image-preview'); 
 
 // Default AI instructions

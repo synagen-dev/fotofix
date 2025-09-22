@@ -129,7 +129,7 @@ body {
 }
 
 .photo-type-selection {
-    margin-bottom: 5px;
+    margin-bottom: 25px;
 }
 
 .photo-type-selection label {
@@ -211,7 +211,7 @@ body {
 
 .enhancement-option input[type="checkbox"] {
     margin-right: 10px;
-    margin-top: 10px;
+    margin-top: 2px;
     transform: scale(1.1);
 }
 
@@ -222,7 +222,7 @@ body {
 .enhancement-option-name {
     font-weight: 600;
     color: #333;
-    
+    margin-bottom: 4px;
 }
 
 .enhancement-option-description {

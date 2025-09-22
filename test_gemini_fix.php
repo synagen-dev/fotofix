@@ -65,3 +65,5 @@ if (file_exists($testImagePath)) {
 echo "<h2>Test Complete</h2>\n";
 echo "Check the error logs for detailed information.\n";
 ?>
+
+

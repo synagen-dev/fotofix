@@ -259,9 +259,35 @@ class GoogleAIIntegration {
     }
     
     /**
+     * Check which GD filters are available
+     */
+    private function checkAvailableFilters() {
+        $availableFilters = [];
+        $filters = [
+            'IMG_FILTER_BRIGHTNESS' => IMG_FILTER_BRIGHTNESS,
+            'IMG_FILTER_CONTRAST' => IMG_FILTER_CONTRAST,
+            'IMG_FILTER_COLORIZE' => IMG_FILTER_COLORIZE,
+            'IMG_FILTER_SATURATE' => IMG_FILTER_SATURATE,
+            'IMG_FILTER_GAUSSIAN_BLUR' => IMG_FILTER_GAUSSIAN_BLUR,
+        ];
+        
+        foreach ($filters as $name => $constant) {
+            if (defined($name)) {
+                $availableFilters[] = $name;
+            }
+        }
+        
+        error_log('Available GD filters: ' . implode(', ', $availableFilters));
+        return $availableFilters;
+    }
+
+    /**
      * Apply enhanced processing based on instructions
      */
     private function applyEnhancedProcessing($image, $width, $height, $instructions) {
+        // Check available filters for debugging
+        $this->checkAvailableFilters();
+        
         // Create a new image with the same dimensions
         $enhanced = imagecreatetruecolor($width, $height);
         
@@ -278,12 +304,22 @@ class GoogleAIIntegration {
         // Exterior enhancements
         if (strpos($instructions, 'grass') !== false || strpos($instructions, 'landscaping') !== false) {
             // Enhance green colors
-            imagefilter($enhanced, IMG_FILTER_COLORIZE, 0, 20, 0);
+            if (defined('IMG_FILTER_COLORIZE')) {
+                imagefilter($enhanced, IMG_FILTER_COLORIZE, 0, 20, 0);
+            } else {
+                // Fallback: increase brightness for greener look
+                imagefilter($enhanced, IMG_FILTER_BRIGHTNESS, 10);
+            }
         }
         
         if (strpos($instructions, 'sky') !== false || strpos($instructions, 'blue') !== false) {
             // Enhance blue colors
-            imagefilter($enhanced, IMG_FILTER_COLORIZE, 0, 0, 20);
+            if (defined('IMG_FILTER_COLORIZE')) {
+                imagefilter($enhanced, IMG_FILTER_COLORIZE, 0, 0, 20);
+            } else {
+                // Fallback: increase brightness for clearer sky
+                imagefilter($enhanced, IMG_FILTER_BRIGHTNESS, 10);
+            }
         }
         
         if (strpos($instructions, 'bright') !== false || strpos($instructions, 'lighting') !== false) {
@@ -299,17 +335,27 @@ class GoogleAIIntegration {
         }
         
         if (strpos($instructions, 'modern') !== false || strpos($instructions, 'furniture') !== false) {
-            // Enhance saturation for more vibrant colors
-            imagefilter($enhanced, IMG_FILTER_SATURATE, 20);
+            // Enhance saturation for more vibrant colors (if available)
+            if (defined('IMG_FILTER_SATURATE')) {
+                imagefilter($enhanced, IMG_FILTER_SATURATE, 20);
+            } else {
+                // Fallback: increase contrast and brightness for more vibrant look
+                imagefilter($enhanced, IMG_FILTER_CONTRAST, 10);
+                imagefilter($enhanced, IMG_FILTER_BRIGHTNESS, 5);
+            }
         }
         
         // General enhancements
         // Increase contrast slightly
-        imagefilter($enhanced, IMG_FILTER_CONTRAST, 10);
+        if (defined('IMG_FILTER_CONTRAST')) {
+            imagefilter($enhanced, IMG_FILTER_CONTRAST, 10);
+        }
         
-        // Sharpen the image
-        imagefilter($enhanced, IMG_FILTER_GAUSSIAN_BLUR);
-        imagefilter($enhanced, IMG_FILTER_GAUSSIAN_BLUR);
+        // Sharpen the image (using blur as a sharpening technique)
+        if (defined('IMG_FILTER_GAUSSIAN_BLUR')) {
+            imagefilter($enhanced, IMG_FILTER_GAUSSIAN_BLUR);
+            imagefilter($enhanced, IMG_FILTER_GAUSSIAN_BLUR);
+        }
         
         return $enhanced;
     }

@@ -270,7 +270,7 @@ class GoogleAIIntegration {
                 ],
                 'generationConfig' => [
                     'temperature' => 0.1,
-                    'maxOutputTokens' => 20, // Very small token limit for test
+                    'maxOutputTokens' => 100, // Very small token limit for test
                 ]
             ];
             

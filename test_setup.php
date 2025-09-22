@@ -61,8 +61,7 @@ if (defined('STRIPE_SECRET_KEY') && STRIPE_SECRET_KEY !== 'sk_test_YOUR_STRIPE_S
 
 // Test 5: Test Google AI connection (if API key is configured)
 echo "<h2>5. Google AI Connection Test</h2>\n";
-echo "Key=".GOOGLE_AI_API_KEY.", model=".GOOGLE_AI_MODEL." <br>";
-/*
+// echo "Key=".GOOGLE_AI_API_KEY.", model=".GOOGLE_AI_MODEL." <br>";
 if (defined('GOOGLE_AI_API_KEY') && GOOGLE_AI_API_KEY !== 'YOUR_GOOGLE_AI_API_KEY') {
     $googleAI = new GoogleAIIntegration(GOOGLE_AI_API_KEY, GOOGLE_AI_MODEL);
     if ($googleAI->testConnection()) {
@@ -73,23 +72,6 @@ if (defined('GOOGLE_AI_API_KEY') && GOOGLE_AI_API_KEY !== 'YOUR_GOOGLE_AI_API_KE
 } else {
     echo "⚠️ Skipping Google AI test (API key not configured)\n";
 }
-*/
-
-$ch = curl_init('https://generativelanguage.googleapis.com/v1beta/models/'.GOOGLE_AI_MODEL);
-curl_setopt_array($ch, [
-    CURLOPT_HTTPHEADER => [
-        "Authorization: Bearer " . GOOGLE_AI_API_KEY,
-        "Content-Type: application/json"
-    ],
-    CURLOPT_POST => true,
-    CURLOPT_POSTFIELDS => json_encode('What LLM model are you?'),
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_TIMEOUT => 30
-]);
-$response = curl_exec($ch);
-curl_close($ch);
-$result = json_decode($response, true);
-echo "<BR>Response=$result<BR>";
 
 // Test 6: Test image processing
 echo "<h2>6. Image Processing Test</h2>\n";

@@ -61,6 +61,7 @@ class GoogleAIIntegration {
                     'topK' => 40,
                     'topP' => 0.95,
                     'maxOutputTokens' => 3000, 
+					'responseMimeType'=> 'image/png'
                 ],
                 'safetySettings' => [
                     [

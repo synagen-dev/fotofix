@@ -9,7 +9,7 @@ class GoogleAIIntegration {
     private $baseUrl;
     private $model;
     
-    public function __construct($apiKey, $model = 'gemini-1.5-flash') {
+    public function __construct($apiKey, $model = 'gemini-2.5-flash-image-preview') {
         $this->apiKey = $apiKey;
         $this->model = $model;
         $this->baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/';

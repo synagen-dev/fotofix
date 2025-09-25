@@ -1,0 +1,79 @@
+# Compiled files
+*.exe
+*.dll
+*.class
+*.pyc
+
+# System files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Backup, Logs and temp
+*.log
+*.tmp
+*.bak
+*.swp
+*.old
+*.orig
+
+# Environment files
+.env
+.env.local
+.env.*
+
+# PHP Composer dependencies
+/vendor/
+
+# PHPStorm or other IDEs
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.vs# Cache / sessions / uploads
+cache/
+tmp/
+uploads/
+sessions/
+
+# Composer lock file (optional)
+composer.lock
+
+# PHPUnit
+.phpunit.result.cache
+
+# Database exports
+*.sql.gz
+
+# System and editor-specific
+*.~*
+*.swp
+*.swo
+*.swncode/
+
+# Node.js
+node_modules/
+
+# Python
+__pycache__/
+.env
+
+# IDE-specific
+.vscode/
+.idea/
+
+# Build output
+dist/
+build/
+out/
+
+doco/
+Doco/
+docs/
+image_archive/
+promo-videos/
+*.mp3
+*.mp4
+*.jpg
+*.png
+

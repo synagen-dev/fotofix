@@ -24,7 +24,12 @@ class GoogleAIIntegration {
      * @return bool Success status
      */
     public function enhanceImage($imagePath, $instructions, $outputPath) {
+		GLOBAL $debugMode;
+		GLOBAL $debugLevel;
+		GLOBAL $glog;
+		if ($debugMode && $glog)fwrite($glog, __FILE__.", line ".__LINE__.", enhanceImage($imagePath, $instructions, $outputPath)\r\n"); 
         try {
+
             // Create a smaller version of the image for Gemini processing
             $tempImagePath = $this->createResizedImageForAI($imagePath);
             if (!$tempImagePath) {
@@ -84,18 +89,20 @@ class GoogleAIIntegration {
             
             // Make the API request
             $response = $this->makeApiRequest($payload);
+			if ($debugMode && $glog)fwrite($glog, __FILE__.", line ".__LINE__.", enhanceImage() Gemini API response:" . $aiResponse."\r\n"); 
             
             if ($response && isset($response['candidates'][0]['content']['parts'][0]['text'])) {
                 // Gemini API returned text response - this means it understood the instructions
                 $aiResponse = $response['candidates'][0]['content']['parts'][0]['text'];
-                error_log('Gemini API response: ' . $aiResponse);
+                // error_log('Gemini API response: ' . $aiResponse);
                 
                 // Check if the response indicates successful understanding
                 if (strpos(strtolower($aiResponse), 'error') === false && 
                     (strpos(strtolower($aiResponse), 'enhance') !== false || 
                      strpos(strtolower($aiResponse), 'improve') !== false ||
                      strpos(strtolower($aiResponse), 'modify') !== false)) {
-                    
+					if ($debugMode && $glog)fwrite($glog, __FILE__.", line ".__LINE__.", enhanceImage() Reasponse OK.. processing\r\n"); 
+                
                     // AI understood the instructions, use enhanced processing
                     return $this->enhancedFallbackEnhancement($imagePath, $outputPath, $instructions);
                 } else {
@@ -312,6 +319,7 @@ class GoogleAIIntegration {
      * @return bool Success status
      */
     private function enhancedFallbackEnhancement($imagePath, $outputPath, $instructions) {
+		
         try {
             $imageInfo = getimagesize($imagePath);
             if (!$imageInfo) {

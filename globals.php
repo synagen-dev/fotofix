@@ -15,7 +15,7 @@ GLOBAL $debugMode;
 $debugMode=true;
 // $debugLevel: 0=none, 1=log on/off & program execution, 2=SQL, 3=cookies, session vars & run variables & parameters
 GLOBAL $debugLevel;
-$debugLevel=1; 
+$debugLevel=3; 
 GLOBAL $glog;
 if($debugMode) $glog=fopen("$logdir/debug.log", "a");
 else {echo "FATAL ERROR - UNABLE TO OPEN log file"; exit(0);}
@@ -84,26 +84,7 @@ ini_set('display_errors', 'Off');
 ini_set('upload_max_filesize', '100M');
 ini_set('post_max_size', '100M');
 ini_set('max_input_time', 300);
-ini_set('max_execution_time', 300);
- 
-// Get country and city of user (in case we want to provide "near me" information)
-// ===============================================================================
-GLOBAL $country;
-GLOBAL $city;
-$country="Unknown";
-$city="Unknown";
-// Get visitor's IP address
-$ip = $_SERVER['REMOTE_ADDR'];
-// If site is behind a proxy or load balancer (common with cloud platforms)
-if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-    $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-}
-$geolocationData = file_get_contents("http://ip-api.com/json/$ip");  // This doesn't seem to be working any more
-$locationInfo = json_decode($geolocationData, true);
-if ($locationInfo && $locationInfo['status'] == 'success') {
-    $country = $locationInfo['country'];
-    $city = $locationInfo['city'];
-} 
+ini_set('max_execution_time', 300); 
 
 $autoload= "/var/www/vendor/autoload.php"; 
 GLOBAL $autoload;

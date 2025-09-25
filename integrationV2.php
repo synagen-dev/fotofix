@@ -21,8 +21,10 @@ if ($response === false) {
 		if (strpos(strtolower($aiResponse), 'error') === false && 
 			(strpos(strtolower($aiResponse), 'enhance') !== false || 
 			 strpos(strtolower($aiResponse), 'improve') !== false ||
-			 strpos(strtolower($aiResponse), 'modify') !== false)) {
-			echo "Response OK.. processing<BR>"); 
+			 strpos(strtolower($aiResponse), 'modify') !== false)
+			 ) 
+		{
+			echo "Response OK.. processing<BR>"; 
 		
 			// Extract returned image
 			if (isset($response['candidates'][0]['content']['parts'][1]['inlineData'])) {

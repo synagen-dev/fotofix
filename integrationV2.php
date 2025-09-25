@@ -13,9 +13,10 @@ $response = file_get_contents($filename);
 if ($response === false) {
     echo "Error: Could not read file contents.";
 } else {
-	if (isset($response['candidates'][0]['content']['parts'][0]['text'])) {
+	$decodedResponse = json_decode($response, true);
+	if (isset($decodedResponse['candidates'][0]['content']['parts'][0]['text'])) {
 		// Gemini API returned text response - this means it understood the instructions
-		$aiResponse = $response['candidates'][0]['content']['parts'][0]['text'];
+		$aiResponse = $decodedResponse['candidates'][0]['content']['parts'][0]['text'];
 		
 		// Check if the response indicates successful understanding (eg. "this is the enhanced image")
 		if (strpos(strtolower($aiResponse), 'error') === false && 
@@ -27,9 +28,9 @@ if ($response === false) {
 			echo "Response OK.. processing<BR>"; 
 		
 			// Extract returned image
-			if (isset($response['candidates'][0]['content']['parts'][1]['inlineData'])) {
-				if (isset($response['candidates'][0]['content']['parts'][1]['inlineData']['mimeType'])) $mimeType=$response['candidates'][0]['content']['parts'][1]['inlineData']['mimeType'];
-				if (isset($response['candidates'][0]['content']['parts'][1]['inlineData']['mimeType']['data'])) $returnedImage=$response['candidates'][0]['content']['parts'][1]['inlineData']['mimeType']['data'];
+			if (isset($decodedResponse['candidates'][0]['content']['parts'][1]['inlineData'])) {
+				if (isset($decodedResponse['candidates'][0]['content']['parts'][1]['inlineData']['mimeType'])) $mimeType=$decodedResponse['candidates'][0]['content']['parts'][1]['inlineData']['mimeType'];
+				if (isset($decodedResponse['candidates'][0]['content']['parts'][1]['inlineData']['mimeType']['data'])) $returnedImage=$decodedResponse['candidates'][0]['content']['parts'][1]['inlineData']['mimeType']['data'];
 				if($mimeType==='image/png')$outfile='response.png';
 				$fout=fopen($outfile,'w');
 				fwrite($fout,$returnedImage);

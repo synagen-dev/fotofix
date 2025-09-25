@@ -1,0 +1,56 @@
+[25-Sep-2025 22:39:58 UTC] Making Gemini API request to: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=AIzaSyD2BuVuWbGKy7UTQpJV_PLz_yT0mMapD98
+[25-Sep-2025 22:39:58 UTC] Payload: {"contents":[{"parts":[{"text":"Hello, this is a test. Please respond with \"Test successful\"."}]}],"generationConfig":{"temperature":0.1,"maxOutputTokens":50}}
+[25-Sep-2025 22:39:59 UTC] HTTP Code: 200
+[25-Sep-2025 22:39:59 UTC] Response: {
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "Test successful"
+          }
+        ],
+        "role": "model"
+      },
+      "finishReason": "STOP",
+      "index": 0
+    }
+  ],
+  "usageMetadata": {
+    "promptTokenCount": 14,
+    "candidatesTokenCount": 2,
+    "totalTokenCount": 16,
+    "promptTokensDetails": [
+      {
+        "modality": "TEXT",
+        "tokenCount": 14
+      }
+    ]
+  },
+  "modelVersion": "gemini-2.5-flash-image-preview",
+  "responseId": "v8TVaKyULrCijrEP_JPkkQ4"
+}
+
+[25-Sep-2025 22:39:59 UTC] cURL Info: {"url":"https:\/\/generativelanguage.googleapis.com\/v1beta\/models\/gemini-2.5-flash-image-preview:generateContent?key=AIzaSyD2BuVuWbGKy7UTQpJV_PLz_yT0mMapD98","content_type":"application\/json; charset=UTF-8","http_code":200,"header_size":334,"request_size":253,"filetime":-1,"ssl_verify_result":0,"redirect_count":0,"total_time":1.372444,"namelookup_time":0.005941,"connect_time":0.006739,"pretransfer_time":0.048554,"size_upload":161,"size_download":540,"speed_download":393,"speed_upload":117,"download_content_length":-1,"upload_content_length":161,"starttransfer_time":0.04863,"redirect_time":0,"redirect_url":"","primary_ip":"64.233.187.95","certinfo":[],"primary_port":443,"local_ip":"10.140.0.9","local_port":52860,"http_version":3,"protocol":2,"ssl_verifyresult":0,"scheme":"HTTPS","appconnect_time_us":47988,"connect_time_us":6739,"namelookup_time_us":5941,"pretransfer_time_us":48554,"redirect_time_us":0,"starttransfer_time_us":48630,"total_time_us":1372444,"effective_method":"POST"}
+[25-Sep-2025 22:39:59 UTC] Gemini API test response: Test successful
+[25-Sep-2025 22:39:59 UTC] Making Gemini API request to: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=AIzaSyD2BuVuWbGKy7UTQpJV_PLz_yT0mMapD98
+[25-Sep-2025 22:39:59 UTC] Payload: {"contents":[{"parts":[{"text":"This is a real estate interior photo. Enhance it to make it more attractive to potential buyers while maintaining the exact structure, dimensions, walls, ceilings, and windows. Replace any old, worn, or outdated furniture with modern, stylish pieces that appeal to contemporary buyers. Use neutral, elegant furniture that complements the space. Remove any furniture that makes the space look cluttered or dated. Remove all personal items, clutter, and unnecessary objects. Clean all surfaces including walls, floors, and fixtures. Remove any dirt, stains, or marks. Make the space look spotless and move-in ready. Enhance the lighting to make the space bright and welcoming. Add warm, inviting light that highlights the best features of the room. Ensure all areas are well-lit and the space feels open and airy. Update wall colors to modern, neutral tones that appeal to a wide range of buyers. Use colors like soft grays, whites, or light beiges. Ensure the color scheme is cohesive throughout the space. Add tasteful, modern decorative elements like plants, artwork, or accessories that enhance the space without cluttering it. Use neutral, elegant pieces that appeal to contemporary buyers. Do not change the structure, dimensions, or architectural features of the building. Maintain the original perspective and composition of the photo."},{"inline_data":{"mime_type":"image\/png","data":"\/9j\/4AAQSkZJRgABAQ{contents of image file removed for brevity}9PpUiTOCRRRTQH\/9k="}}]}],"generationConfig":{"temperature":0.7,"topK":40,"topP":0.95,"maxOutputTokens":3000,"responseMimeType":"image\/png"},"safetySettings":[{"category":"HARM_CATEGORY_HARASSMENT","threshold":"BLOCK_MEDIUM_AND_ABOVE"},{"category":"HARM_CATEGORY_HATE_SPEECH","threshold":"BLOCK_MEDIUM_AND_ABOVE"},{"category":"HARM_CATEGORY_SEXUALLY_EXPLICIT","threshold":"BLOCK_MEDIUM_AND_ABOVE"},{"category":"HARM_CATEGORY_DANGEROUS_CONTENT","threshold":"BLOCK_MEDIUM_AND_ABOVE"}]}
+[25-Sep-2025 22:40:01 UTC] HTTP Code: 400
+[25-Sep-2025 22:40:01 UTC] Response: {
+  "error": {
+    "code": 400,
+    "message": "* GenerateContentRequest.generation_config.response_mime_type: allowed mimetypes are `text/plain`, `application/json`, `application/xml`, `application/yaml` and `text/x.enum`.\n",
+    "status": "INVALID_ARGUMENT"
+  }
+}
+
+[25-Sep-2025 22:40:01 UTC] cURL Info: {"url":"https:\/\/generativelanguage.googleapis.com\/v1beta\/models\/gemini-2.5-flash-image-preview:generateContent?key=AIzaSyD2BuVuWbGKy7UTQpJV_PLz_yT0mMapD98","content_type":"application\/json; charset=UTF-8","http_code":400,"header_size":334,"request_size":255,"filetime":-1,"ssl_verify_result":0,"redirect_count":0,"total_time":1.192628,"namelookup_time":0.001356,"connect_time":0.002389,"pretransfer_time":0.044196,"size_upload":86998,"size_download":267,"speed_download":223,"speed_upload":72946,"download_content_length":-1,"upload_content_length":86998,"starttransfer_time":0.0442,"redirect_time":0,"redirect_url":"","primary_ip":"108.177.97.95","certinfo":[],"primary_port":443,"local_ip":"10.140.0.9","local_port":52828,"http_version":3,"protocol":2,"ssl_verifyresult":0,"scheme":"HTTPS","appconnect_time_us":44081,"connect_time_us":2389,"namelookup_time_us":1356,"pretransfer_time_us":44196,"redirect_time_us":0,"starttransfer_time_us":44200,"total_time_us":1192628,"effective_method":"POST"}
+[25-Sep-2025 22:40:01 UTC] API error: HTTP 400 - {
+  "error": {
+    "code": 400,
+    "message": "* GenerateContentRequest.generation_config.response_mime_type: allowed mimetypes are `text/plain`, `application/json`, `application/xml`, `application/yaml` and `text/x.enum`.\n",
+    "status": "INVALID_ARGUMENT"
+  }
+}
+
+[25-Sep-2025 22:40:01 UTC] Google AI failed, using fallback enhancement for: fotofix_68d5c4be73a2e0.77442482

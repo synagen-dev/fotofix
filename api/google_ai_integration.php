@@ -60,8 +60,7 @@ class GoogleAIIntegration {
                     'temperature' => 0.7,
                     'topK' => 40,
                     'topP' => 0.95,
-                    'maxOutputTokens' => 3000, 
-					'responseMimeType'=> 'image/png'
+                    'maxOutputTokens' => 3000
                 ],
                 'safetySettings' => [
                     [

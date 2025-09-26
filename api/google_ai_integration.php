@@ -118,7 +118,10 @@ class GoogleAIIntegration {
 							fclose($fout);	
 							if ($debugMode && $glog)fwrite($glog, __FILE__.", line ".__LINE__.", enhanceImage() Image output ok. output file=$outputPath. \r\n"); 							
 							return true;
-						}else error_log( "data part NOT FOUND");
+						}else {
+							error_log( "data part NOT FOUND");
+							return false;
+						}
 					}else {
 						error_log( "inlineData NOT FOUND");
 						return false;
@@ -175,7 +178,7 @@ class GoogleAIIntegration {
         
         // Log detailed response information
         error_log('HTTP Code: ' . $httpCode);
-        error_log('Response: ' . $response);
+        //error_log('Response: ' . $response);
         error_log('cURL Info: ' . json_encode($info));
         
         if ($error) {

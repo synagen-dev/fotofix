@@ -151,8 +151,8 @@ function processImageWithAI($originalPath, $instructions, $uniqueId) {
         }
         
         return [
-            'preview_url' => 'api/get_image.php?type=preview&id=' . $uniqueId."&mimeType=".urlencode($mimeType),
-            'download_url' => 'api/get_image.php?type=enhanced&id=' . $uniqueId."&mimeType=".urlencode($mimeType)
+            'preview_url' => 'api/get_image.php?type=preview&id=' . $uniqueId,
+            'download_url' => 'api/get_image.php?type=enhanced&id=' . $uniqueId
         ];
         
     } catch (Exception $e) {

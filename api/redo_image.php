@@ -80,22 +80,22 @@ function processImageWithAI($originalPath, $instructions, $uniqueId) {
         $googleAI = new GoogleAIIntegration(GOOGLE_AI_API_KEY, GOOGLE_AI_MODEL);
         $aiSuccess = false;
         
-        // Test connection first
+        // Test connection first, then send image to AI for enhancing
         if ($googleAI->testConnection()) {
             $aiSuccess = $googleAI->enhanceImage($originalPath, $instructions, $enhancedPath);
         }
         
         // Fallback to basic enhancement if AI fails
-        if (!$aiSuccess) {
-            error_log('Google AI failed, using fallback enhancement for: ' . $uniqueId);
-            $aiSuccess = FallbackImageEnhancement::enhance($originalPath, $enhancedPath);
-        }
+        //if (!$aiSuccess) {
+            //error_log('Google AI failed, using fallback enhancement for: ' . $uniqueId);
+            // $aiSuccess = FallbackImageEnhancement::enhance($originalPath, $enhancedPath);
+        //}
         
         if (!$aiSuccess) {
             // Last resort: just copy the original
-            if (!copy($originalPath, $enhancedPath)) {
+            //if (!copy($originalPath, $enhancedPath)) {
                 return false;
-            }
+            //}
         }
         
         // Create preview version

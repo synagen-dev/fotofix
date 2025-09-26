@@ -33,7 +33,7 @@ class GoogleAIIntegration {
             // Create a smaller version of the image for Gemini processing
             $tempImagePath = $this->createResizedImageForAI($imagePath);
             if (!$tempImagePath) {
-                error_log('Failed to create resized image for AI processing');
+                error_log(__FILE__." Line ".__LINE__.' - Failed to create resized image for AI processing');
                 return false;
             }
             
@@ -90,7 +90,8 @@ class GoogleAIIntegration {
             // Make the API request. Returns json response from AI, decoded into an array
             $response = $this->makeApiRequest($payload);
 			if ($debugMode && $glog)fwrite($glog, __FILE__.", line ".__LINE__.", enhanceImage() \r\n"); 
-            
+			
+        /*** Don't always get a text response...    
             if ($response && isset($response['candidates'][0]['content']['parts'][0]['text'])) {
                 // Gemini API returned text response - this means it understood the instructions
                 $aiResponse = $response['candidates'][0]['content']['parts'][0]['text'];
@@ -102,44 +103,45 @@ class GoogleAIIntegration {
                      strpos(strtolower($aiResponse), 'improve') !== false ||
                      strpos(strtolower($aiResponse), 'modify') !== false)) {
 					if ($debugMode && $glog)fwrite($glog, __FILE__.", line ".__LINE__.", enhanceImage() Reasponse OK.. processing\r\n"); 
-                
+        ***/        
                     // AI understood the instructions, extract and save the returned image
-					if (isset($response['candidates'][0]['content']['parts'][1]['inlineData'])) {
-						if (isset($response['candidates'][0]['content']['parts'][1]['inlineData']['mimeType'])) {
-							$mimeType=$response['candidates'][0]['content']['parts'][1]['inlineData']['mimeType'];
-							if ($debugMode && $glog)fwrite($glog, __FILE__.", line ".__LINE__.", enhanceImage() mimeType=$mimeType \r\n");  
-						}else error_log("MimeType not found");
-						
-						if (isset($response['candidates'][0]['content']['parts'][1]['inlineData']['data'])) {
-							$returnedImage=$response['candidates'][0]['content']['parts'][1]['inlineData']['data'];
-							if ($debugMode && $glog)fwrite($glog, __FILE__.", line ".__LINE__.", enhanceImage() Got data \r\n"); 							
-							$fout=fopen($outputPath,'w');
-							fwrite($fout,base64_decode($returnedImage));
-							fclose($fout);	
-							if ($debugMode && $glog)fwrite($glog, __FILE__.", line ".__LINE__.", enhanceImage() Image output ok. output file=$outputPath. \r\n"); 							
-							return true;
-						}else {
-							error_log( "data part NOT FOUND");
-							return false;
-						}
+					if (isset($response['candidates'][0]['content']['parts'][0]['inlineData'])) $inlineData=$response['candidates'][0]['content']['parts'][0]['inlineData'];
+					elseif (isset($response['candidates'][0]['content']['parts'][1]['inlineData'])) $inlineData=$response['candidates'][0]['content']['parts'][1]['inlineData'];
+					else{
+						error_log(__FILE__." Line ".__LINE__.' - Unable to find data part');
+						return false;
+					}
+					if (isset($inlineData['mimeType'])) {
+						$mimeType=$inlineData['mimeType'];
+						if ($debugMode && $glog)fwrite($glog, __FILE__.", line ".__LINE__.", enhanceImage() mimeType=$mimeType \r\n");  
+					}else error_log(__FILE__." Line ".__LINE__." - MimeType not found");
+					
+					if (isset($inlineData['data'])) {
+						$returnedImage=$inlineData['data'];
+						if ($debugMode && $glog)fwrite($glog, __FILE__.", line ".__LINE__.", enhanceImage() Got data \r\n"); 							
+						$fout=fopen($outputPath,'w');
+						fwrite($fout,base64_decode($returnedImage));
+						fclose($fout);	
+						if ($debugMode && $glog)fwrite($glog, __FILE__.", line ".__LINE__.", enhanceImage() Image output ok. output file=$outputPath. \r\n"); 							
+						return true;
 					}else {
-						error_log( "inlineData NOT FOUND");
+						error_log( __FILE__." Line ".__LINE__." - data part NOT FOUND");
 						return false;
 					}
 					
                     //return $this->enhancedFallbackEnhancement($imagePath, $outputPath, $instructions);
                 } else {
                     // AI didn't understand or had issues
-                    error_log('Gemini API response indicates issues, using basic enhancement');
+                    error_log(__FILE__." Line ".__LINE__.' - Gemini API response indicates issues, using basic enhancement');
                     return false;
                 }
 
-			}else error_log("Unable to find text part");
+			//}else error_log("Unable to find text part");
            
             return false;
             
         } catch (Exception $e) {
-            error_log('Google AI enhancement error: ' . $e->getMessage());
+            error_log(__FILE__." Line ".__LINE__.' - Google AI enhancement error: ' . $e->getMessage());
             return false;
         }
     }
@@ -154,8 +156,8 @@ class GoogleAIIntegration {
         $url = $this->baseUrl . $this->model . ':generateContent?key=' . $this->apiKey;
         
         // Log the request for debugging
-        error_log('Making Gemini API request to: ' . $url);
-        error_log('Payload: ' . json_encode($payload));
+        error_log(__FILE__." Line ".__LINE__.' - Making Gemini API request to: ' . $url);
+        error_log(__FILE__." Line ".__LINE__.' - Payload: ' . json_encode($payload));
         
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -177,25 +179,25 @@ class GoogleAIIntegration {
         curl_close($ch);
         
         // Log detailed response information
-        error_log('HTTP Code: ' . $httpCode);
-        error_log('Response: ' . $response);
-        error_log('cURL Info: ' . json_encode($info));
+        error_log(__FILE__." Line ".__LINE__.' - HTTP Code: ' . $httpCode);
+        error_log(__FILE__." Line ".__LINE__.' - Response: ' . $response);
+        error_log(__FILE__." Line ".__LINE__.' - cURL Info: ' . json_encode($info));
         
         if ($error) {
-            error_log('cURL error: ' . $error);
+            error_log(__FILE__." Line ".__LINE__.' - cURL error: ' . $error);
             return false;
         }
         
         if ($httpCode !== 200) {
-            error_log('API error: HTTP ' . $httpCode . ' - ' . $response);
+            error_log(__FILE__." Line ".__LINE__.' - API error: HTTP ' . $httpCode . ' - ' . $response);
             return false;
         }
         
         $decodedResponse = json_decode($response, true);
         
         if (json_last_error() !== JSON_ERROR_NONE) {
-            error_log('JSON decode error: ' . json_last_error_msg());
-            error_log('Raw response: ' . $response);
+            error_log(__FILE__." Line ".__LINE__.' - JSON decode error: ' . json_last_error_msg());
+            error_log(__FILE__." Line ".__LINE__.' - Raw response: ' . $response);
             return false;
         }
         
@@ -265,7 +267,7 @@ class GoogleAIIntegration {
             return $result ? $tempPath : false;
             
         } catch (Exception $e) {
-            error_log('Error creating resized image for AI: ' . $e->getMessage());
+            error_log(__FILE__." Line ".__LINE__.' - Error creating resized image for AI: ' . $e->getMessage());
             return false;
         }
     }
@@ -310,14 +312,14 @@ class GoogleAIIntegration {
             // Check if we got a valid response
             if ($response && isset($response['candidates'][0]['content']['parts'][0]['text'])) {
                 $responseText = $response['candidates'][0]['content']['parts'][0]['text'];
-                error_log('Gemini API test response: ' . $responseText);
+                error_log(__FILE__." Line ".__LINE__.' - Gemini API test response: ' . $responseText);
                 return true;
             }
             
             return false;
             
         } catch (Exception $e) {
-            error_log('Connection test error: ' . $e->getMessage());
+            error_log(__FILE__." Line ".__LINE__.' - Connection test error: ' . $e->getMessage());
             return false;
         }
     }
@@ -373,7 +375,7 @@ class GoogleAIIntegration {
             return $result;
             
         } catch (Exception $e) {
-            error_log('Enhanced fallback enhancement error: ' . $e->getMessage());
+            error_log(__FILE__." Line ".__LINE__.' - Enhanced fallback enhancement error: ' . $e->getMessage());
             return false;
         }
     }
@@ -397,7 +399,7 @@ class GoogleAIIntegration {
             }
         }
         
-        error_log('Available GD filters: ' . implode(', ', $availableFilters));
+        //error_log(__FILE__." Line ".__LINE__.' - Available GD filters: ' . implode(', ', $availableFilters));
         return $availableFilters;
     }
 

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Modal Test - FotoFix</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="main-content">
+            <h1>Image Modal Test</h1>
+            <p>Click on any image below to test the modal functionality:</p>
+            
+            <div class="images-grid">
+                <div class="image-item">
+                    <img src="https://via.placeholder.com/300x200/667eea/ffffff?text=Test+Image+1" 
+                         class="image-preview" 
+                         onclick="showFullImage(this.src)" 
+                         alt="Test Image 1">
+                    <div class="image-info">Test Image 1 (300x200)</div>
+                </div>
+                
+                <div class="image-item">
+                    <img src="https://via.placeholder.com/400x300/28a745/ffffff?text=Test+Image+2" 
+                         class="image-preview" 
+                         onclick="showFullImage(this.src)" 
+                         alt="Test Image 2">
+                    <div class="image-info">Test Image 2 (400x300)</div>
+                </div>
+                
+                <div class="image-item">
+                    <img src="https://via.placeholder.com/500x400/dc3545/ffffff?text=Test+Image+3" 
+                         class="image-preview" 
+                         onclick="showFullImage(this.src)" 
+                         alt="Test Image 3">
+                    <div class="image-info">Test Image 3 (500x400)</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                <h3>Modal Features:</h3>
+                <ul>
+                    <li>✅ Click on image to open modal</li>
+                    <li>✅ Click outside image to close modal</li>
+                    <li>✅ Click X button to close modal</li>
+                    <li>✅ Press Escape key to close modal</li>
+                    <li>✅ Image scales to fit screen properly</li>
+                    <li>✅ Dark backdrop for better focus</li>
+                    <li>✅ Responsive design for mobile</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showFullImage(imageUrl) {
+            // Create a modal to show full-size image
+            const modal = document.createElement('div');
+            modal.className = 'image-modal';
+            modal.style.display = 'flex';
+            modal.innerHTML = `
+                <div class="image-modal-backdrop"></div>
+                <div class="image-modal-content">
+                    <button class="image-modal-close" onclick="this.closest('.image-modal').remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <img src="${imageUrl}" class="image-modal-image" alt="Enhanced image">
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Close modal when clicking on backdrop
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal || e.target.classList.contains('image-modal-backdrop')) {
+                    modal.remove();
+                }
+            });
+            
+            // Close modal with Escape key
+            const handleKeyPress = (e) => {
+                if (e.key === 'Escape') {
+                    modal.remove();
+                    document.removeEventListener('keydown', handleKeyPress);
+                }
+            };
+            document.addEventListener('keydown', handleKeyPress);
+        }
+    </script>
+</body>
+</html>

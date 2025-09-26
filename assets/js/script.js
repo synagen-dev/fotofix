@@ -273,15 +273,34 @@ class FotoFixApp {
     showFullImage(imageUrl) {
         // Create a modal to show full-size image
         const modal = document.createElement('div');
-        modal.className = 'modal';
-        modal.style.display = 'block';
+        modal.className = 'image-modal';
+        modal.style.display = 'flex';
         modal.innerHTML = `
-            <div class="modal-content" style="max-width: 90%; max-height: 90%;">
-                <img src="${imageUrl}" style="width: 100%; height: auto; border-radius: 8px;">
-                <button class="btn btn-primary" onclick="this.parentElement.parentElement.remove()" style="margin-top: 20px;">Close</button>
+            <div class="image-modal-backdrop"></div>
+            <div class="image-modal-content">
+                <button class="image-modal-close" onclick="this.closest('.image-modal').remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <img src="${imageUrl}" class="image-modal-image" alt="Enhanced image">
             </div>
         `;
         document.body.appendChild(modal);
+        
+        // Close modal when clicking on backdrop
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal || e.target.classList.contains('image-modal-backdrop')) {
+                modal.remove();
+            }
+        });
+        
+        // Close modal with Escape key
+        const handleKeyPress = (e) => {
+            if (e.key === 'Escape') {
+                modal.remove();
+                document.removeEventListener('keydown', handleKeyPress);
+            }
+        };
+        document.addEventListener('keydown', handleKeyPress);
     }
 
     resetApp() {

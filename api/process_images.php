@@ -125,39 +125,34 @@ try {
 
 function processImageWithAI($originalPath, $instructions, $uniqueId) {
     try {
-        $enhancedPath = ENHANCED_DIR . $uniqueId . '_enhanced.jpg';
-        $previewPath = PREVIEW_DIR . $uniqueId . '_preview.jpg';
+
+        $enhancedPath = ENHANCED_DIR . $uniqueId . '_enhanced.png';
+        $previewPath = PREVIEW_DIR . $uniqueId . '_preview.png';
         
-        // Try Google AI enhancement first
+        // Google AI enhancement 
         $googleAI = new GoogleAIIntegration(GOOGLE_AI_API_KEY, GOOGLE_AI_MODEL);
         $aiSuccess = false;
         
         // Test connection first
         if ($googleAI->testConnection()) {
+			// Test succeeded. Now send our image and receive response
             $aiSuccess = $googleAI->enhanceImage($originalPath, $instructions, $enhancedPath);
         }
         
-        // Fallback to basic enhancement if AI fails
+        // Error if AI fails
         if (!$aiSuccess) {
-            error_log('Google AI failed, using fallback enhancement for: ' . $uniqueId);
-            $aiSuccess = FallbackImageEnhancement::enhance($originalPath, $enhancedPath);
+            error_log('Google AI failed for: ' . $uniqueId);
+            return false;
         }
-        
-        if (!$aiSuccess) {
-            // Last resort: just copy the original
-            if (!copy($originalPath, $enhancedPath)) {
-                return false;
-            }
-        }
-        
+    
         // Create preview version
         if (!createPreviewImage($enhancedPath, $previewPath)) {
             return false;
         }
         
         return [
-            'preview_url' => 'api/get_image.php?type=preview&id=' . $uniqueId,
-            'download_url' => 'api/get_image.php?type=enhanced&id=' . $uniqueId
+            'preview_url' => 'api/get_image.php?type=preview&id=' . $uniqueId."&mimeType=".urlencode($mimeType),
+            'download_url' => 'api/get_image.php?type=enhanced&id=' . $uniqueId."&mimeType=".urlencode($mimeType)
         ];
         
     } catch (Exception $e) {

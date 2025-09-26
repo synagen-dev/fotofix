@@ -87,7 +87,7 @@ class GoogleAIIntegration {
                 ]
             ];
             
-            // Make the API request
+            // Make the API request. Returns json response from AI, decoded into an array
             $response = $this->makeApiRequest($payload);
 			if ($debugMode && $glog)fwrite($glog, __FILE__.", line ".__LINE__.", enhanceImage() Gemini API response:" . $aiResponse."\r\n"); 
             
@@ -103,15 +103,35 @@ class GoogleAIIntegration {
                      strpos(strtolower($aiResponse), 'modify') !== false)) {
 					if ($debugMode && $glog)fwrite($glog, __FILE__.", line ".__LINE__.", enhanceImage() Reasponse OK.. processing\r\n"); 
                 
-                    // AI understood the instructions, use enhanced processing
-                    return $this->enhancedFallbackEnhancement($imagePath, $outputPath, $instructions);
+                    // AI understood the instructions, extract and save the returned image
+					if (isset($response['candidates'][0]['content']['parts'][1]['inlineData'])) {
+						if (isset($response['candidates'][0]['content']['parts'][1]['inlineData']['mimeType'])) {
+							$mimeType=$response['candidates'][0]['content']['parts'][1]['inlineData']['mimeType'];
+							if ($debugMode && $glog)fwrite($glog, __FILE__.", line ".__LINE__.", enhanceImage() mimeType=$mimeType \r\n");  
+						}else error_log("MimeType not found");
+						
+						if (isset($response['candidates'][0]['content']['parts'][1]['inlineData']['data'])) {
+							$returnedImage=$response['candidates'][0]['content']['parts'][1]['inlineData']['data'];
+							echo "Got data<BR>";
+							$fout=fopen($outputPath,'w');
+							fwrite($fout,base64_decode($returnedImage));
+							fclose($fout);	
+							if ($debugMode && $glog)fwrite($glog, __FILE__.", line ".__LINE__.", enhanceImage() Image output ok. output file=$outputPath. \r\n"); 							
+						}else error_log( "data part NOT FOUND");
+					}else {
+						error_log( "inlineData NOT FOUND");
+						return false;
+					}
+					
+                    //return $this->enhancedFallbackEnhancement($imagePath, $outputPath, $instructions);
                 } else {
-                    // AI didn't understand or had issues, use basic enhancement
+                    // AI didn't understand or had issues
                     error_log('Gemini API response indicates issues, using basic enhancement');
-                    return FallbackImageEnhancement::enhance($imagePath, $outputPath);
+                    return false;
                 }
-            }
-            
+
+			}else echo "Unable to find text part";
+           
             return false;
             
         } catch (Exception $e) {
@@ -489,112 +509,4 @@ class GoogleAIIntegration {
     }
 }
 
-/**
- * Fallback image enhancement using basic image processing
- * This is used when Google AI is not available or fails
- */
-class FallbackImageEnhancement {
-    
-    /**
-     * Apply basic image enhancements
-     * 
-     * @param string $inputPath Input image path
-     * @param string $outputPath Output image path
-     * @return bool Success status
-     */
-    public static function enhance($inputPath, $outputPath) {
-        try {
-            $imageInfo = getimagesize($inputPath);
-            if (!$imageInfo) {
-                return false;
-            }
-            
-            $width = $imageInfo[0];
-            $height = $imageInfo[1];
-            $mimeType = $imageInfo['mime'];
-            
-            // Create source image
-            $sourceImage = self::createImageFromFile($inputPath, $mimeType);
-            if (!$sourceImage) {
-                return false;
-            }
-            
-            // Apply enhancements
-            $enhancedImage = self::applyEnhancements($sourceImage, $width, $height);
-            
-            // Save enhanced image
-            $result = self::saveImage($enhancedImage, $outputPath, $mimeType);
-            
-            // Clean up
-            imagedestroy($sourceImage);
-            imagedestroy($enhancedImage);
-            
-            return $result;
-            
-        } catch (Exception $e) {
-            error_log('Fallback enhancement error: ' . $e->getMessage());
-            return false;
-        }
-    }
-    
-    /**
-     * Create image resource from file
-     */
-    private static function createImageFromFile($path, $mimeType) {
-        switch ($mimeType) {
-            case 'image/jpeg':
-                return imagecreatefromjpeg($path);
-            case 'image/png':
-                return imagecreatefrompng($path);
-            case 'image/webp':
-                return imagecreatefromwebp($path);
-            default:
-                return false;
-        }
-    }
-    
-    /**
-     * Apply basic image enhancements
-     */
-    private static function applyEnhancements($image, $width, $height) {
-        // Create a new image with the same dimensions
-        $enhanced = imagecreatetruecolor($width, $height);
-        
-        // Preserve transparency for PNG
-        imagealphablending($enhanced, false);
-        imagesavealpha($enhanced, true);
-        
-        // Copy the original image
-        imagecopy($enhanced, $image, 0, 0, 0, 0, $width, $height);
-        
-        // Apply basic enhancements
-        // Increase brightness slightly
-        imagefilter($enhanced, IMG_FILTER_BRIGHTNESS, 10);
-        
-        // Increase contrast slightly
-        imagefilter($enhanced, IMG_FILTER_CONTRAST, 10);
-        
-        // Sharpen the image
-        imagefilter($enhanced, IMG_FILTER_GAUSSIAN_BLUR);
-        imagefilter($enhanced, IMG_FILTER_GAUSSIAN_BLUR);
-        
-        return $enhanced;
-    }
-    
-    /**
-     * Save image to file
-     */
-    private static function saveImage($image, $path, $mimeType) {
-        switch ($mimeType) {
-            case 'image/jpeg':
-                return imagejpeg($image, $path, 95);
-            case 'image/png':
-                return imagepng($image, $path, 8);
-            case 'image/webp':
-                return imagewebp($image, $path, 95);
-            default:
-                return false;
-        }
-    }
-}
 ?>

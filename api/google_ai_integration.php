@@ -117,6 +117,7 @@ class GoogleAIIntegration {
 							fwrite($fout,base64_decode($returnedImage));
 							fclose($fout);	
 							if ($debugMode && $glog)fwrite($glog, __FILE__.", line ".__LINE__.", enhanceImage() Image output ok. output file=$outputPath. \r\n"); 							
+							return true;
 						}else error_log( "data part NOT FOUND");
 					}else {
 						error_log( "inlineData NOT FOUND");
@@ -130,7 +131,7 @@ class GoogleAIIntegration {
                     return false;
                 }
 
-			}else echo "Unable to find text part";
+			}else error_log("Unable to find text part");
            
             return false;
             

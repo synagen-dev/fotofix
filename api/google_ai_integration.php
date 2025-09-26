@@ -178,7 +178,7 @@ class GoogleAIIntegration {
         
         // Log detailed response information
         error_log('HTTP Code: ' . $httpCode);
-        //error_log('Response: ' . $response);
+        error_log('Response: ' . $response);
         error_log('cURL Info: ' . json_encode($info));
         
         if ($error) {

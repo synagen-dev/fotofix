@@ -89,7 +89,7 @@ class GoogleAIIntegration {
             
             // Make the API request. Returns json response from AI, decoded into an array
             $response = $this->makeApiRequest($payload);
-			if ($debugMode && $glog)fwrite($glog, __FILE__.", line ".__LINE__.", enhanceImage() Gemini API response:" . $aiResponse."\r\n"); 
+			if ($debugMode && $glog)fwrite($glog, __FILE__.", line ".__LINE__.", enhanceImage() \r\n"); 
             
             if ($response && isset($response['candidates'][0]['content']['parts'][0]['text'])) {
                 // Gemini API returned text response - this means it understood the instructions

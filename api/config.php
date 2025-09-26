@@ -137,13 +137,13 @@ $projectId = getenv('PROJECTID');  // GCP project ID
 if ($stripe_live){
 	define('STRIPE_PRODUCT_ID',      'prod_T7gKlnHDBo9rhG');
 	define('STRIPE_PRICE_ID',        'price_1SBQyCHSEHsecLJH4oVJCTsZ');
-	define('STRIPE_SIGNING_SECRET',  getSecretValue($projectId, getenv('STRIPE_SIGNING_TEST')) );
+	define('STRIPE_SIGNING_SECRET',  getSecretValue($projectId, getenv('STRIPE_SIGNING_SECRET_LIVE')) );
 	define('STRIPE_SECRET_KEY',      getSecretValue($projectId, getenv('STRIPE_API_KEY_FOTOFIX')) );
 	define('STRIPE_PUBLISHABLE_KEY', getSecretValue($projectId, getenv('STRIPE_PUBLIC_FOTOFIX_LIVE') ) ); 
 } else {
 	define('STRIPE_PRODUCT_ID',      'prod_T7gbk0goUMlxvW');
 	define('STRIPE_PRICE_ID',        'price_1SBRE7HcRbxienT6LXNgW4P8');
-	define('STRIPE_SIGNING_SECRET',  getSecretValue($projectId, getenv('STRIPE_SIGNING_LIVE')) );
+	define('STRIPE_SIGNING_SECRET',  getSecretValue($projectId, getenv('STRIPE_SIGNING_SECRET_TEST')) );
 	define('STRIPE_SECRET_KEY',      getSecretValue($projectId, getenv('STRIPE_KEY_FOTOFIX_TEST')) );
 	define('STRIPE_PUBLISHABLE_KEY', getSecretValue($projectId, getenv('STRIPE_PUBLIC_FOTOFIX_TEST') ) ); 
 }

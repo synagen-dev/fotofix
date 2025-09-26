@@ -42,7 +42,7 @@ if ($response === false) {
 					echo "Got data<BR>";
 					if($mimeType==='image/png')$outfile='response.png';
 					$fout=fopen($outfile,'w');
-					fwrite($fout,$returnedImage);
+					fwrite($fout,base64_decode($returnedImage));
 					fclose($fout);	
 					echo 'Image output ok. <BR><img src="'.$outfile.'"><BR>';			
 				}else echo "data not found<BR>";

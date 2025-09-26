@@ -112,7 +112,7 @@ class GoogleAIIntegration {
 						
 						if (isset($response['candidates'][0]['content']['parts'][1]['inlineData']['data'])) {
 							$returnedImage=$response['candidates'][0]['content']['parts'][1]['inlineData']['data'];
-							echo "Got data<BR>";
+							if ($debugMode && $glog)fwrite($glog, __FILE__.", line ".__LINE__.", enhanceImage() Got data \r\n"); 							
 							$fout=fopen($outputPath,'w');
 							fwrite($fout,base64_decode($returnedImage));
 							fclose($fout);	

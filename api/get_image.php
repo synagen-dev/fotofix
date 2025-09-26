@@ -4,7 +4,6 @@ require_once 'config.php';
 // Get parameters
 $type = $_GET['type'] ?? '';
 $id = $_GET['id'] ?? '';
-$mimeType = urldecode($_GET['mimeType']) ?? '';
 
 if (empty($type) || empty($id)) {
     http_response_code(400);
@@ -27,12 +26,10 @@ if (!preg_match('/^[a-zA-Z0-9._-]+$/', $id)) {
 $filename = '';
 switch ($type) {
     case 'preview':
-        if ($mimeType==='image/png') $filename = PREVIEW_DIR . $id . '_preview.png';
-		else $filename = PREVIEW_DIR . $id . '_preview.jpg';
+        $filename = PREVIEW_DIR . $id . '_preview.png';
         break;
     case 'enhanced':
-        if ($mimeType==='image/png') $filename = ENHANCED_DIR . $id . '_enhanced.png';
-		else  $filename = ENHANCED_DIR . $id . '_enhanced.jpg';
+        $filename = ENHANCED_DIR . $id . '_enhanced.png';
         break;
 }
 
@@ -43,6 +40,7 @@ if (!file_exists($filename)) {
 }
 
 // Set appropriate headers
+$mimeType = 'image/png';
 header('Content-Type: ' . $mimeType);
 header('Content-Length: ' . filesize($filename));
 header('Cache-Control: public, max-age=3600'); // Cache for 1 hour

@@ -179,6 +179,7 @@ class FotoFixApp {
             
             const redoBtn = document.createElement('button');
             redoBtn.className = 'redo-btn';
+            redoBtn.setAttribute('data-redo-index', index);
             redoBtn.innerHTML = '<i class="fas fa-redo"></i> Redo';
             redoBtn.addEventListener('click', () => this.redoImage(index));
             
@@ -245,6 +246,12 @@ class FotoFixApp {
 
     async redoImage(index) {
         try {
+            // Show loading modal
+            this.showLoadingModal();
+            
+            // Disable the redo button for this image
+            this.disableRedoButton(index);
+            
             const response = await fetch('api/redo_image.php', {
                 method: 'POST',
                 headers: {
@@ -267,6 +274,9 @@ class FotoFixApp {
         } catch (error) {
             console.error('Error redoing image:', error);
             this.showError('An error occurred while redoing the image.');
+        } finally {
+            // Hide loading modal
+            this.hideLoadingModal();
         }
     }
 
@@ -322,6 +332,14 @@ class FotoFixApp {
 
     hideLoadingModal() {
         document.getElementById('loadingModal').style.display = 'none';
+    }
+
+    disableRedoButton(index) {
+        const redoButton = document.querySelector(`[data-redo-index="${index}"]`);
+        if (redoButton) {
+            redoButton.disabled = true;
+            redoButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        }
     }
 
     showError(message) {

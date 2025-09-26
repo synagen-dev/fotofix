@@ -420,6 +420,19 @@ body {
     transform: translateY(-1px);
 }
 
+.redo-btn:disabled {
+    background: #6c757d;
+    color: #fff;
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.7;
+}
+
+.redo-btn:disabled:hover {
+    background: #6c757d;
+    transform: none;
+}
+
 .checkout-summary {
     display: flex;
     justify-content: space-between;

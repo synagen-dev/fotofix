@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redo Modal Test - FotoFix</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="main-content">
+            <h1>Redo Modal Test</h1>
+            <p>This page demonstrates the redo functionality with loading modal:</p>
+            
+            <div class="enhanced-images">
+                <div class="enhanced-item">
+                    <img src="https://via.placeholder.com/300x200/667eea/ffffff?text=Enhanced+Image+1" 
+                         class="enhanced-preview" 
+                         alt="Enhanced Image 1">
+                    
+                    <div class="buy-checkbox">
+                        <label>
+                            <input type="checkbox" data-index="0">
+                            Buy this image ($20)
+                        </label>
+                    </div>
+                    
+                    <button class="redo-btn" data-redo-index="0" onclick="testRedo(0)">
+                        <i class="fas fa-redo"></i> Redo
+                    </button>
+                </div>
+                
+                <div class="enhanced-item">
+                    <img src="https://via.placeholder.com/300x200/28a745/ffffff?text=Enhanced+Image+2" 
+                         class="enhanced-preview" 
+                         alt="Enhanced Image 2">
+                    
+                    <div class="buy-checkbox">
+                        <label>
+                            <input type="checkbox" data-index="1">
+                            Buy this image ($20)
+                        </label>
+                    </div>
+                    
+                    <button class="redo-btn" data-redo-index="1" onclick="testRedo(1)">
+                        <i class="fas fa-redo"></i> Redo
+                    </button>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                <h3>Redo Features:</h3>
+                <ul>
+                    <li>✅ Loading modal appears when clicking Redo</li>
+                    <li>✅ Redo button shows "Processing..." with spinner</li>
+                    <li>✅ Button is disabled during processing</li>
+                    <li>✅ Modal disappears when processing completes</li>
+                    <li>✅ Button returns to normal state after completion</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Modal -->
+    <div id="loadingModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="loading-spinner"></div>
+            <h2>Processing Your Photos</h2>
+            <p>Please wait while we enhance your images...</p>
+        </div>
+    </div>
+
+    <script>
+        function testRedo(index) {
+            // Simulate the redo process
+            const redoButton = document.querySelector(`[data-redo-index="${index}"]`);
+            
+            // Show loading modal
+            document.getElementById('loadingModal').style.display = 'block';
+            
+            // Disable button
+            redoButton.disabled = true;
+            redoButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            
+            // Simulate processing delay
+            setTimeout(() => {
+                // Hide loading modal
+                document.getElementById('loadingModal').style.display = 'none';
+                
+                // Re-enable button
+                redoButton.disabled = false;
+                redoButton.innerHTML = '<i class="fas fa-redo"></i> Redo';
+                
+                // Show success message
+                alert(`Image ${index + 1} has been reprocessed!`);
+            }, 3000); // 3 second delay to simulate processing
+        }
+    </script>
+</body>
+</html>

@@ -1,8 +1,8 @@
 <?php
 require_once 'config.php';
 
-// Include Stripe PHP library (you'll need to install this via Composer)
-// require_once 'vendor/autoload.php';
+// Include Stripe PHP library
+require_once $autoload;
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -51,26 +51,37 @@ try {
         }
     }
 
-    // For now, we'll simulate Stripe checkout creation
-    // In production, you would use the actual Stripe API
-    $checkoutSessionId = 'cs_test_' . uniqid();
-    $checkoutUrl = 'checkout_success.php?session_id=' . $checkoutSessionId . '&selected=' . implode(',', $selectedImages);
+    // Create actual Stripe checkout session
+    \Stripe\Stripe::setApiKey(STRIPE_SECRET_KEY);
     
-    // Store session data temporarily (in production, use a database or Redis)
+    $session = \Stripe\Checkout\Session::create([
+        'payment_method_types' => ['card'],
+        'line_items' => $lineItems,
+        'mode' => 'payment',
+        'success_url' => 'https://' . $base_domain . '/checkout_success.php?session_id={CHECKOUT_SESSION_ID}',
+        'cancel_url' => 'https://' . $base_domain . '/index.html',
+        'metadata' => [
+            'selected_images' => implode(',', $selectedImages),
+            'enhanced_images' => json_encode($enhancedImages),
+            'total_amount' => $totalAmount
+        ]
+    ]);
+    
+    // Store session data temporarily for webhook processing
     $sessionData = [
-        'session_id' => $checkoutSessionId,
+        'session_id' => $session->id,
         'selected_images' => $selectedImages,
         'enhanced_images' => $enhancedImages,
         'total_amount' => $totalAmount,
         'created_at' => time()
     ];
     
-    file_put_contents(TEMP_DIR . 'checkout_' . $checkoutSessionId . '.json', json_encode($sessionData));
+    file_put_contents(TEMP_DIR . 'checkout_' . $session->id . '.json', json_encode($sessionData));
 
     echo json_encode([
         'success' => true,
-        'checkout_url' => $checkoutUrl,
-        'session_id' => $checkoutSessionId
+        'checkout_url' => $session->url,
+        'session_id' => $session->id
     ]);
 
 } catch (Exception $e) {
@@ -80,25 +91,4 @@ try {
         'message' => $e->getMessage()
     ]);
 }
-
-/*
-// Actual Stripe implementation would look like this:
-function createStripeCheckout($lineItems, $selectedImages, $enhancedImages) {
-    \Stripe\Stripe::setApiKey(STRIPE_SECRET_KEY);
-    
-    $session = \Stripe\Checkout\Session::create([
-        'payment_method_types' => ['card'],
-        'line_items' => $lineItems,
-        'mode' => 'payment',
-        'success_url' => 'https://yourdomain.com/checkout_success.php?session_id={CHECKOUT_SESSION_ID}',
-        'cancel_url' => 'https://yourdomain.com/index.html',
-        'metadata' => [
-            'selected_images' => implode(',', $selectedImages),
-            'enhanced_images' => json_encode($enhancedImages)
-        ]
-    ]);
-    
-    return $session;
-}
-*/
 ?>

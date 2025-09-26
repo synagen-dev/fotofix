@@ -3,53 +3,37 @@ require_once 'api/config.php';
 
 // Get session ID from URL
 $sessionId = $_GET['session_id'] ?? '';
-$selectedImages = $_GET['selected'] ?? '';
 
-if (empty($sessionId) || empty($selectedImages)) {
+if (empty($sessionId)) {
     http_response_code(400);
     echo 'Invalid checkout session';
     exit;
 }
 
-// Load session data
-$sessionFile = TEMP_DIR . 'checkout_' . $sessionId . '.json';
-if (!file_exists($sessionFile)) {
-    http_response_code(404);
-    echo 'Checkout session not found';
-    exit;
-}
+// Check if payment was completed (webhook should have processed this)
+$paidImagesFile = TEMP_DIR . 'paid_' . $sessionId . '.json';
+if (!file_exists($paidImagesFile)) {
+    // Payment might still be processing, show waiting message
+    $waiting = true;
+    $downloadFiles = [];
+} else {
+    $waiting = false;
+    $paidImages = json_decode(file_get_contents($paidImagesFile), true);
+    $downloadFiles = [];
 
-$sessionData = json_decode(file_get_contents($sessionFile), true);
-if (!$sessionData) {
-    http_response_code(500);
-    echo 'Invalid session data';
-    exit;
-}
-
-// In production, you would verify the payment with Stripe here
-// For now, we'll assume payment was successful
-
-$selectedIndices = explode(',', $selectedImages);
-$enhancedImages = $sessionData['enhanced_images'];
-$downloadFiles = [];
-
-// Prepare download files
-foreach ($selectedIndices as $index) {
-    if (isset($enhancedImages[$index])) {
-        $imageData = $enhancedImages[$index];
-        $enhancedPath = ENHANCED_DIR . $imageData['unique_id'] . '_enhanced.jpg';
+    // Prepare download files
+    foreach ($paidImages as $imageData) {
+        $enhancedPath = ENHANCED_DIR . $imageData['unique_id'] . '_enhanced.png';
         
         if (file_exists($enhancedPath)) {
             $downloadFiles[] = [
                 'name' => 'enhanced_' . $imageData['original_name'],
-                'path' => $enhancedPath
+                'path' => $enhancedPath,
+                'unique_id' => $imageData['unique_id']
             ];
         }
     }
 }
-
-// Clean up session file
-unlink($sessionFile);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -107,28 +91,35 @@ unlink($sessionFile);
 </head>
 <body>
     <div class="success-container">
-        <i class="fas fa-check-circle success-icon"></i>
-        <h1>Payment Successful!</h1>
-        <p>Thank you for your purchase. Your enhanced images are ready for download.</p>
-        
-        <div class="download-section">
-            <h3>Download Your Enhanced Images</h3>
-            <p>You can download individual images or all images at once.</p>
+        <?php if ($waiting): ?>
+            <i class="fas fa-spinner fa-spin success-icon" style="color: #007bff;"></i>
+            <h1>Processing Payment...</h1>
+            <p>Please wait while we process your payment. This page will automatically refresh.</p>
+            <div id="countdown" style="margin-top: 20px; font-size: 1.2rem; color: #666;"></div>
+        <?php else: ?>
+            <i class="fas fa-check-circle success-icon"></i>
+            <h1>Payment Successful!</h1>
+            <p>Thank you for your purchase. Your enhanced images are ready for download.</p>
             
-            <div class="download-buttons">
-                <?php foreach ($downloadFiles as $file): ?>
-                    <button class="download-btn" onclick="downloadFile('<?php echo $file['name']; ?>', '<?php echo $file['path']; ?>')">
-                        <i class="fas fa-download"></i> <?php echo htmlspecialchars($file['name']); ?>
+            <div class="download-section">
+                <h3>Download Your Enhanced Images</h3>
+                <p>You can download individual images or all images at once.</p>
+                
+                <div class="download-buttons">
+                    <?php foreach ($downloadFiles as $file): ?>
+                        <button class="download-btn" onclick="downloadFile('<?php echo $file['name']; ?>', '<?php echo $file['unique_id']; ?>')">
+                            <i class="fas fa-download"></i> <?php echo htmlspecialchars($file['name']); ?>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <button class="download-btn download-all-btn" onclick="downloadAllFiles()">
+                        <i class="fas fa-download"></i> Download All Images
                     </button>
-                <?php endforeach; ?>
+                </div>
             </div>
-            
-            <div style="margin-top: 30px;">
-                <button class="download-btn download-all-btn" onclick="downloadAllFiles()">
-                    <i class="fas fa-download"></i> Download All Images
-                </button>
-            </div>
-        </div>
+        <?php endif; ?>
         
         <div style="margin-top: 40px;">
             <a href="index.html" class="btn btn-primary">
@@ -139,11 +130,31 @@ unlink($sessionFile);
 
     <script>
         const downloadFiles = <?php echo json_encode($downloadFiles); ?>;
+        const waiting = <?php echo $waiting ? 'true' : 'false'; ?>;
+        const sessionId = '<?php echo $sessionId; ?>';
         
-        function downloadFile(filename, filepath) {
+        <?php if ($waiting): ?>
+        // Auto-refresh page every 3 seconds while waiting for payment processing
+        let countdown = 3;
+        const countdownElement = document.getElementById('countdown');
+        
+        function updateCountdown() {
+            countdownElement.textContent = `Refreshing in ${countdown} seconds...`;
+            countdown--;
+            
+            if (countdown < 0) {
+                window.location.reload();
+            } else {
+                setTimeout(updateCountdown, 1000);
+            }
+        }
+        
+        updateCountdown();
+        <?php else: ?>
+        function downloadFile(filename, uniqueId) {
             // Create a temporary link to download the file
             const link = document.createElement('a');
-            link.href = 'api/download_file.php?file=' + encodeURIComponent(filepath) + '&name=' + encodeURIComponent(filename);
+            link.href = 'api/download_file.php?type=enhanced&id=' + encodeURIComponent(uniqueId) + '&name=' + encodeURIComponent(filename);
             link.download = filename;
             document.body.appendChild(link);
             link.click();
@@ -154,10 +165,11 @@ unlink($sessionFile);
             // Download all files one by one
             downloadFiles.forEach((file, index) => {
                 setTimeout(() => {
-                    downloadFile(file.name, file.path);
+                    downloadFile(file.name, file.unique_id);
                 }, index * 500); // Small delay between downloads
             });
         }
+        <?php endif; ?>
     </script>
 </body>
 </html>

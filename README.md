@@ -70,7 +70,9 @@ An AI-powered web application that helps real estate agents enhance their proper
 
 2. **Stripe Keys**:
    - Get your keys from Stripe Dashboard
-   - Update `STRIPE_PUBLISHABLE_KEY` and `STRIPE_SECRET_KEY` in `api/config.php`
+   - Configure webhook endpoint: `https://yourdomain.com/api/stripe_webhook.php`
+   - Set environment variables for API keys (see `STRIPE_INTEGRATION.md`)
+   - Test with Stripe test cards: 4242 4242 4242 4242
 
 ### File Upload Settings
 
@@ -124,7 +126,8 @@ fotofix/
 - `POST /api/process_images.php` - Process uploaded images
 - `GET /api/get_image.php` - Serve image files
 - `POST /api/create_checkout.php` - Create Stripe checkout session
-- `GET /api/download_file.php` - Download enhanced images
+- `POST /api/stripe_webhook.php` - Handle Stripe payment webhooks
+- `GET /api/download_file.php` - Download enhanced images (payment required)
 - `POST /api/redo_image.php` - Reprocess a specific image
 
 ## Customization

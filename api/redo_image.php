@@ -73,8 +73,8 @@ try {
 
 function processImageWithAI($originalPath, $instructions, $uniqueId) {
     try {
-        $enhancedPath = ENHANCED_DIR . $uniqueId . '_enhanced.jpg';
-        $previewPath = PREVIEW_DIR . $uniqueId . '_preview.jpg';
+        $enhancedPath = ENHANCED_DIR . $uniqueId . '_enhanced.png';
+        $previewPath = PREVIEW_DIR . $uniqueId . '_preview.png';
         
         // Try Google AI enhancement first
         $googleAI = new GoogleAIIntegration(GOOGLE_AI_API_KEY, GOOGLE_AI_MODEL);

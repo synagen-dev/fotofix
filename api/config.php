@@ -135,17 +135,17 @@ GLOBAL $stripe_live;
 $stripe_live=false;
 $projectId = getenv('PROJECTID');  // GCP project ID
 if ($stripe_live){
-	define('STRIPE_PRODUCT_ID',      'prod_T6CFdw1gQaKIy2');
-	define('STRIPE_PRICE_ID',        'price_1S9zqYHa7s4rHLRu8IfrOht3');
+	define('STRIPE_PRODUCT_ID',      'prod_T7gKlnHDBo9rhG');
+	define('STRIPE_PRICE_ID',        'price_1SBQyCHSEHsecLJH4oVJCTsZ');
 	define('STRIPE_SIGNING_SECRET',  getSecretValue($projectId, getenv('STRIPE_SIGNING_TEST')) );
-	define('STRIPE_SECRET_KEY',      getSecretValue($projectId, getenv('STRIPE_API_KEY_CHATBOT')) );
-	define('STRIPE_PUBLISHABLE_KEY', getSecretValue($projectId, getenv('STRIPE_PUBLIC_CHATBOT_LIVE') ) ); 
+	define('STRIPE_SECRET_KEY',      getSecretValue($projectId, getenv('STRIPE_API_KEY_FOTOFIX')) );
+	define('STRIPE_PUBLISHABLE_KEY', getSecretValue($projectId, getenv('STRIPE_PUBLIC_FOTOFIX_LIVE') ) ); 
 } else {
-	define('STRIPE_PRODUCT_ID',      'prod_T6CKsyxfHI7odI');
-	define('STRIPE_PRICE_ID',        'price_1S9zw6HgZZaGOV9e2t9c6sYz');
+	define('STRIPE_PRODUCT_ID',      'prod_T7gbk0goUMlxvW');
+	define('STRIPE_PRICE_ID',        'price_1SBRE7HcRbxienT6LXNgW4P8');
 	define('STRIPE_SIGNING_SECRET',  getSecretValue($projectId, getenv('STRIPE_SIGNING_LIVE')) );
-	define('STRIPE_SECRET_KEY',      getSecretValue($projectId, getenv('STRIPE_KEY_CHATBOT_TEST')) );
-	define('STRIPE_PUBLISHABLE_KEY', getSecretValue($projectId, getenv('STRIPE_PUBLIC_CHATBOT_TEST') ) ); 
+	define('STRIPE_SECRET_KEY',      getSecretValue($projectId, getenv('STRIPE_KEY_FOTOFIX_TEST')) );
+	define('STRIPE_PUBLISHABLE_KEY', getSecretValue($projectId, getenv('STRIPE_PUBLIC_FOTOFIX_TEST') ) ); 
 }
 define('PRICE_PER_IMAGE', 2000); // $20.00 in cents
 

@@ -31,10 +31,18 @@ try {
     $imageData = $enhancedImages[$imageIndex];
     $uniqueId = $imageData['unique_id'];
     
-    // Find the original file
-    $originalFiles = glob(TEMP_DIR . $uniqueId . '_*');
+    // Extract base unique ID (remove any _redo suffixes for finding original file)
+    $baseUniqueId = preg_replace('/_redo.*$/', '', $uniqueId);
+    
+    // Debug logging
+    error_log("Redo request - Original unique_id: $uniqueId, Base unique_id: $baseUniqueId");
+    
+    // Find the original file using base unique ID
+    $originalFiles = glob(TEMP_DIR . $baseUniqueId . '_*');
+    error_log("Found original files: " . implode(', ', $originalFiles));
+    
     if (empty($originalFiles)) {
-        throw new Exception('Original image not found');
+        throw new Exception('Original image not found for base ID: ' . $baseUniqueId);
     }
     
     $originalPath = $originalFiles[0];
@@ -45,18 +53,26 @@ try {
         DEFAULT_INSTRUCTIONS . ' ' . $customInstructions : 
         DEFAULT_INSTRUCTIONS;
 
+    // Generate new unique ID for redo (increment redo counter)
+    $redoCount = 1;
+    if (preg_match('/_redo(\d+)$/', $uniqueId, $matches)) {
+        $redoCount = intval($matches[1]) + 1;
+    }
+    $newUniqueId = $baseUniqueId . '_redo' . $redoCount;
+    
     // Process with AI again
-    $enhancedImage = processImageWithAI($originalPath, $finalInstructions, $uniqueId . '_redo');
+    $enhancedImage = processImageWithAI($originalPath, $finalInstructions, $newUniqueId);
     
     if ($enhancedImage) {
         echo json_encode([
             'success' => true,
             'enhanced_image' => [
                 'original_name' => $imageData['original_name'],
-                'unique_id' => $uniqueId . '_redo',
+                'unique_id' => $newUniqueId,
                 'preview_url' => $enhancedImage['preview_url'],
                 'download_url' => $enhancedImage['download_url'],
-                'session_id' => $imageData['session_id']
+                'session_id' => $imageData['session_id'],
+                'photo_type' => $imageData['photo_type'] ?? 'interior'
             ]
         ]);
     } else {

@@ -67,7 +67,7 @@ Remove all personal items, clutter, and unnecessary objects. Clean all surfaces 
 **Description**: Improve interior lighting
 **Instructions**: 
 ```
-Enhance the lighting to make the space bright and welcoming. Add warm, inviting light that highlights the best features of the room. Ensure all areas are well-lit and the space feels open and airy.
+Enhance the lighting to make the space bright and welcoming. Add warm, inviting light that highlights the best features of the room. Ensure all areas are well-lit and the space feels open and airy. DO NOT alter the ceiling light fittings, unless specified elsewhere.
 ```
 
 ### 4. Color Scheme Update
@@ -88,7 +88,7 @@ Add tasteful, modern decorative elements like plants, artwork, or accessories th
 
 All enhancement instructions end with this safety clause:
 ```
-Do not change the structure, dimensions, or architectural features of the building. Maintain the original perspective and composition of the photo.
+Do not change the structure, dimensions, or architectural features of the building. Maintain the original perspective and composition of the photo. Do not change the shape or size of any doors or windows.
 ```
 
 ## How to Modify Instructions

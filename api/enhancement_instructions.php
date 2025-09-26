@@ -103,7 +103,7 @@ class EnhancementInstructions {
         }
         
         // Add final safety instructions
-        $fullInstructions .= " Do not change the structure, dimensions, or architectural features of the building. Maintain the original perspective and composition of the photo.";
+        $fullInstructions .= " Do not change the structure, dimensions, or architectural features of the building. Maintain the original perspective and composition of the photo. Do not change the size or shape of doors or windows.";
         
         return $fullInstructions;
     }

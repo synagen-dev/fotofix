@@ -54,17 +54,20 @@ try {
     // Create actual Stripe checkout session
     \Stripe\Stripe::setApiKey(STRIPE_SECRET_KEY);
     
+    // Store only essential data in metadata (under 500 chars)
+    $metadata = [
+        'selected_count' => count($selectedImages),
+        'total_amount' => $totalAmount,
+        'session_type' => 'fotofix_checkout'
+    ];
+    
     $session = \Stripe\Checkout\Session::create([
         'payment_method_types' => ['card'],
         'line_items' => $lineItems,
         'mode' => 'payment',
         'success_url' => 'https://' . $base_domain . '/checkout_success.php?session_id={CHECKOUT_SESSION_ID}',
         'cancel_url' => 'https://' . $base_domain . '/index.html',
-        'metadata' => [
-            'selected_images' => implode(',', $selectedImages),
-            'enhanced_images' => json_encode($enhancedImages),
-            'total_amount' => $totalAmount
-        ]
+        'metadata' => $metadata
     ]);
     
     // Store session data temporarily for webhook processing
@@ -73,6 +76,7 @@ try {
         'selected_images' => $selectedImages,
         'enhanced_images' => $enhancedImages,
         'total_amount' => $totalAmount,
+        'session_type' => 'fotofix_checkout',
         'created_at' => time()
     ];
     

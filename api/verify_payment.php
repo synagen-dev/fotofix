@@ -49,6 +49,11 @@ try {
             $sessionData = json_decode(file_get_contents($sessionDataFile), true);
             
             if ($sessionData) {
+                // Verify this is a FotoFix checkout session
+                if (!isset($sessionData['session_type']) || $sessionData['session_type'] !== 'fotofix_checkout') {
+                    throw new Exception('Not a FotoFix checkout session');
+                }
+                
                 // Mark images as paid
                 $paidImages = [];
                 foreach ($sessionData['selected_images'] as $index) {

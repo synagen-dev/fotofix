@@ -74,6 +74,12 @@ function processPaymentManually($sessionId, $session) {
         return;
     }
     
+    // Verify this is a FotoFix checkout session
+    if (!isset($sessionData['session_type']) || $sessionData['session_type'] !== 'fotofix_checkout') {
+        error_log('Not a FotoFix checkout session: ' . $sessionId);
+        return;
+    }
+    
     // Mark images as paid and available for download
     $paidImages = [];
     foreach ($sessionData['selected_images'] as $index) {

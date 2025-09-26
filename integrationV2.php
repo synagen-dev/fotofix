@@ -29,13 +29,19 @@ if ($response === false) {
 		
 			// Extract returned image
 			if (isset($decodedResponse['candidates'][0]['content']['parts'][1]['inlineData'])) {
-				if (isset($decodedResponse['candidates'][0]['content']['parts'][1]['inlineData']['mimeType'])) $mimeType=$decodedResponse['candidates'][0]['content']['parts'][1]['inlineData']['mimeType'];
-				if (isset($decodedResponse['candidates'][0]['content']['parts'][1]['inlineData']['mimeType']['data'])) $returnedImage=$decodedResponse['candidates'][0]['content']['parts'][1]['inlineData']['mimeType']['data'];
-				if($mimeType==='image/png')$outfile='response.png';
-				$fout=fopen($outfile,'w');
-				fwrite($fout,$returnedImage);
-				fclose($fout);	
-				echo 'Image output ok. <BR><img src="'.$outfile.'"><BR>';			
+				if (isset($decodedResponse['candidates'][0]['content']['parts'][1]['inlineData']['mimeType'])) {
+					$mimeType=$decodedResponse['candidates'][0]['content']['parts'][1]['inlineData']['mimeType'];
+					echo "mimeType=$mimeType <BR>";
+				}
+				if (isset($decodedResponse['candidates'][0]['content']['parts'][1]['inlineData']['data'])) {
+					$returnedImage=$decodedResponse['candidates'][0]['content']['parts'][1]['inlineData']['data'];
+					echo "Got data<BR>";
+					if($mimeType==='image/png')$outfile='response.png';
+					$fout=fopen($outfile,'w');
+					fwrite($fout,$returnedImage);
+					fclose($fout);	
+					echo 'Image output ok. <BR><img src="'.$outfile.'"><BR>';			
+				}else echo "data not found<BR>";
 			}
 		} else {
 			 echo 'Gemini API response indicates issues';

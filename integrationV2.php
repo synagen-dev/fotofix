@@ -13,10 +13,13 @@ $response = file_get_contents($filename);
 if ($response === false) {
     echo "Error: Could not read file contents.";
 } else {
+	echo 'read json file<BR>';
+	
 	$decodedResponse = json_decode($response, true);
 	if (isset($decodedResponse['candidates'][0]['content']['parts'][0]['text'])) {
 		// Gemini API returned text response - this means it understood the instructions
 		$aiResponse = $decodedResponse['candidates'][0]['content']['parts'][0]['text'];
+		echo "Text part of resoonse=$aiResponse<BR><BR>";
 		
 		// Check if the response indicates successful understanding (eg. "this is the enhanced image")
 		if (strpos(strtolower($aiResponse), 'error') === false && 
@@ -32,7 +35,8 @@ if ($response === false) {
 				if (isset($decodedResponse['candidates'][0]['content']['parts'][1]['inlineData']['mimeType'])) {
 					$mimeType=$decodedResponse['candidates'][0]['content']['parts'][1]['inlineData']['mimeType'];
 					echo "mimeType=$mimeType <BR>";
-				}
+				}else echo "MimeType not found<BR>";
+				
 				if (isset($decodedResponse['candidates'][0]['content']['parts'][1]['inlineData']['data'])) {
 					$returnedImage=$decodedResponse['candidates'][0]['content']['parts'][1]['inlineData']['data'];
 					echo "Got data<BR>";
@@ -42,7 +46,7 @@ if ($response === false) {
 					fclose($fout);	
 					echo 'Image output ok. <BR><img src="'.$outfile.'"><BR>';			
 				}else echo "data not found<BR>";
-			}
+			}else echo "inlineData NOT FOUND<BR>";
 		} else {
 			 echo 'Gemini API response indicates issues';
 		}

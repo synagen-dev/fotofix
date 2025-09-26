@@ -1,6 +1,9 @@
 <?php
 require_once 'api/config.php';
 
+// Include Stripe PHP library
+require_once $autoload;
+
 // Get session ID from URL
 $sessionId = $_GET['session_id'] ?? '';
 
@@ -12,16 +15,36 @@ if (empty($sessionId)) {
 
 // Check if payment was completed (webhook should have processed this)
 $paidImagesFile = TEMP_DIR . 'paid_' . $sessionId . '.json';
-if (!file_exists($paidImagesFile)) {
-    // Payment might still be processing, show waiting message
-    $waiting = true;
-    $downloadFiles = [];
-} else {
-    $waiting = false;
-    $paidImages = json_decode(file_get_contents($paidImagesFile), true);
-    $downloadFiles = [];
+$waiting = false;
+$downloadFiles = [];
 
-    // Prepare download files
+if (file_exists($paidImagesFile)) {
+    // Webhook already processed the payment
+    $paidImages = json_decode(file_get_contents($paidImagesFile), true);
+    $waiting = false;
+} else {
+    // Webhook hasn't processed yet, verify payment directly with Stripe
+    try {
+        \Stripe\Stripe::setApiKey(STRIPE_SECRET_KEY);
+        $session = \Stripe\Checkout\Session::retrieve($sessionId);
+        
+        if ($session->payment_status === 'paid') {
+            // Payment is confirmed, process it manually
+            processPaymentManually($sessionId, $session);
+            $paidImages = json_decode(file_get_contents($paidImagesFile), true);
+            $waiting = false;
+        } else {
+            // Payment not yet completed
+            $waiting = true;
+        }
+    } catch (Exception $e) {
+        error_log('Error verifying payment: ' . $e->getMessage());
+        $waiting = true;
+    }
+}
+
+// Prepare download files
+if (!$waiting && isset($paidImages)) {
     foreach ($paidImages as $imageData) {
         $enhancedPath = ENHANCED_DIR . $imageData['unique_id'] . '_enhanced.png';
         
@@ -33,6 +56,42 @@ if (!file_exists($paidImagesFile)) {
             ];
         }
     }
+}
+
+function processPaymentManually($sessionId, $session) {
+    // Get session data from our stored file
+    $sessionDataFile = TEMP_DIR . 'checkout_' . $sessionId . '.json';
+    
+    if (!file_exists($sessionDataFile)) {
+        error_log('Session data file not found: ' . $sessionDataFile);
+        return;
+    }
+    
+    $sessionData = json_decode(file_get_contents($sessionDataFile), true);
+    
+    if (!$sessionData) {
+        error_log('Invalid session data for: ' . $sessionId);
+        return;
+    }
+    
+    // Mark images as paid and available for download
+    $paidImages = [];
+    foreach ($sessionData['selected_images'] as $index) {
+        if (isset($sessionData['enhanced_images'][$index])) {
+            $imageData = $sessionData['enhanced_images'][$index];
+            $imageData['paid'] = true;
+            $imageData['payment_session_id'] = $sessionId;
+            $imageData['payment_date'] = time();
+            $paidImages[] = $imageData;
+        }
+    }
+    
+    // Store paid images data
+    $paidImagesFile = TEMP_DIR . 'paid_' . $sessionId . '.json';
+    file_put_contents($paidImagesFile, json_encode($paidImages));
+    
+    // Clean up the checkout session file
+    unlink($sessionDataFile);
 }
 ?>
 <!DOCTYPE html>
@@ -143,10 +202,39 @@ if (!file_exists($paidImagesFile)) {
             countdown--;
             
             if (countdown < 0) {
-                window.location.reload();
+                // Try to verify payment before refreshing
+                verifyPayment();
             } else {
                 setTimeout(updateCountdown, 1000);
             }
+        }
+        
+        function verifyPayment() {
+            fetch('api/verify_payment.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    session_id: sessionId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.paid) {
+                    // Payment confirmed, reload page to show downloads
+                    window.location.reload();
+                } else {
+                    // Still waiting, continue countdown
+                    countdown = 3;
+                    updateCountdown();
+                }
+            })
+            .catch(error => {
+                console.error('Error verifying payment:', error);
+                // Continue with normal refresh
+                window.location.reload();
+            });
         }
         
         updateCountdown();
@@ -168,6 +256,20 @@ if (!file_exists($paidImagesFile)) {
                     downloadFile(file.name, file.unique_id);
                 }, index * 500); // Small delay between downloads
             });
+        }
+        
+        // Auto-download all files when page loads (payment successful)
+        if (downloadFiles.length > 0) {
+            // Show a message that downloads are starting
+            const downloadMessage = document.createElement('div');
+            downloadMessage.style.cssText = 'background: #d4edda; color: #155724; padding: 15px; margin: 20px 0; border-radius: 5px; border: 1px solid #c3e6cb;';
+            downloadMessage.innerHTML = '<i class="fas fa-download"></i> Downloads starting automatically...';
+            document.querySelector('.success-container').insertBefore(downloadMessage, document.querySelector('.download-section'));
+            
+            // Start downloads after a short delay
+            setTimeout(() => {
+                downloadAllFiles();
+            }, 1000);
         }
         <?php endif; ?>
     </script>

@@ -130,11 +130,11 @@ class GoogleAIIntegration {
 					}
 					
                     //return $this->enhancedFallbackEnhancement($imagePath, $outputPath, $instructions);
-                } else {
+                //} else {
                     // AI didn't understand or had issues
-                    error_log(__FILE__." Line ".__LINE__.' - Gemini API response indicates issues, using basic enhancement');
-                    return false;
-                }
+                //    error_log(__FILE__." Line ".__LINE__.' - Gemini API response indicates issues, using basic enhancement');
+                //    return false;
+                //}
 
 			//}else error_log("Unable to find text part");
            

@@ -2,7 +2,8 @@
 
 ## Overview
 
-The FotoFix application now includes full Stripe integration for processing payments for enhanced images. The integration supports quantity-based pricing where customers pay $20 per image they select for purchase.
+The FotoFix application now includes full Stripe integration for processing payments for enhanced images. The integration supports 
+quantity-based pricing where customers pay $20 per image they select for purchase.
 
 ## Configuration
 

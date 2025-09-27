@@ -197,7 +197,7 @@ class GoogleAIIntegration {
         
         if (json_last_error() !== JSON_ERROR_NONE) {
             error_log(__FILE__." Line ".__LINE__.' - JSON decode error: ' . json_last_error_msg());
-            error_log(__FILE__." Line ".__LINE__.' - Raw response: ' . $response);
+            // error_log(__FILE__." Line ".__LINE__.' - Raw response: ' . $response);
             return false;
         }
         

@@ -311,7 +311,7 @@ class GoogleAIIntegration {
             
             // Check if we got a valid response
 			if ($response && isset($response['error']) ) {
-				if (isset($response['error']['message']) $responseText = 'AI is unavailable at the moment. Message='.response['error']['message'];
+				if (isset($response['error']['message'])) $responseText = 'AI is unavailable at the moment. Message='.response['error']['message'];
 				else $responseText = 'AI Is not responding at the moment. Please try again later';
                 error_log(__FILE__." Line ".__LINE__.' - Gemini API test ERROR. Response: ' . $responseText);
                 return responseText;

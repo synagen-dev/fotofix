@@ -66,7 +66,7 @@ echo "Model: " . (defined('GOOGLE_AI_MODEL') ? GOOGLE_AI_MODEL : 'Not defined') 
 
 if (defined('GOOGLE_AI_API_KEY') && !empty(GOOGLE_AI_API_KEY)) {
     $googleAI = new GoogleAIIntegration(GOOGLE_AI_API_KEY, GOOGLE_AI_MODEL);
-    if ($googleAI->testConnection()) {
+    if ($googleAI->testConnection() ===true) {
         echo "✅ Google AI connection successful\n";
     } else {
         echo "❌ Google AI connection failed\n";

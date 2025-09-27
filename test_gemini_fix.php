@@ -20,10 +20,11 @@ if (defined('GOOGLE_AI_API_KEY') && !empty(GOOGLE_AI_API_KEY)) {
 // Test 2: Test connection with small payload
 echo "<h2>2. Connection Test</h2>\n";
 $googleAI = new GoogleAIIntegration(GOOGLE_AI_API_KEY, GOOGLE_AI_MODEL);
-if ($googleAI->testConnection()) {
+$result=$googleAI->testConnection();
+if ($result===true) {
     echo "✅ Connection test successful\n";
 } else {
-    echo "❌ Connection test failed\n";
+    echo "❌ Connection test failed: $result\n";
 }
 
 // Test 3: Test image processing with small image

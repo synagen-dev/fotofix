@@ -132,7 +132,7 @@ function getSecretValue($projectId, $secretId) {
 }
 // Stripe settings
 GLOBAL $stripe_live;
-$stripe_live=false;
+$stripe_live=true;
 $projectId = getenv('PROJECTID');  // GCP project ID
 if ($stripe_live){
 	define('STRIPE_PRODUCT_ID',      'prod_T7gKlnHDBo9rhG');
